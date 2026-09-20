@@ -1,0 +1,10 @@
+com\rutaia\Modelo\Calificacion.class
+com\rutaia\Modelo\Consulta.class
+com\rutaia\Modelo\Curso.class
+com\rutaia\Modelo\Fuente.class
+com\rutaia\Enums\Nivel.class
+com\rutaia\Modelo\Usuario.class
+com\rutaia\RutaiaApplication.class
+com\rutaia\Modelo\Recomendacion.class
+com\rutaia\Enums\Categoria.class
+com\rutaia\Enums\Rol.class
