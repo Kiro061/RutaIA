@@ -23,16 +23,16 @@ public class AuthController {
     public Map<String, String> login(@RequestBody LoginRequest request) {
         UsuarioResponse usuario;
         try {
-            usuario = usuarioService.buscarPorUsuario(request.usuario());
+            usuario = usuarioService.buscarPorCorreo(request.usuario());
         } catch (Exception e) {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        if (!request.contrasenia().equals(usuario.contrasenia())) {
+        if (!request.contrasenia().equals(usuario.password())) {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        String token = jwtService.generateToken(usuario.usuario());
+        String token = jwtService.generateToken(usuario.correo());
         return Map.of("token", token);
     }
 }
