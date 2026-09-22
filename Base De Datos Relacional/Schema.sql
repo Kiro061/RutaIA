@@ -2,15 +2,13 @@ CREATE DATABASE IF NOT EXISTS rutaia
 
 USE rutaia;
 
-
 CREATE TABLE usuario (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre     VARCHAR(100) NOT NULL,
     correo     VARCHAR(150) NOT NULL UNIQUE,  
-    password VARCHAR(255) NOT NULL,         
+    password   VARCHAR(255) NOT NULL,         
     rol        ENUM('ESTUDIANTE', 'ADMIN') NOT NULL DEFAULT 'ESTUDIANTE'
 );
-
 
 CREATE TABLE curso (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -23,15 +21,6 @@ CREATE TABLE curso (
     activo      BOOLEAN      NOT NULL DEFAULT TRUE,
 
     INDEX idx_curso_activo_nivel (activo, nivel)
-);
-
-
-CREATE TABLE fuente (
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    curso_id  BIGINT       NOT NULL,
-    titulo    VARCHAR(150) NOT NULL,
-    contenido TEXT         NOT NULL,
-    FOREIGN KEY (curso_id) REFERENCES curso (id) ON DELETE CASCADE
 );
 
 
@@ -50,12 +39,10 @@ CREATE TABLE recomendacion (
     id                BIGINT AUTO_INCREMENT PRIMARY KEY,
     consulta_id       BIGINT        NOT NULL,
     curso_id          BIGINT        NOT NULL,
-    fuente_id         BIGINT        NOT NULL,
     puntaje_similitud DECIMAL(5,4),
     justificacion     TEXT          NOT NULL,
     FOREIGN KEY (consulta_id) REFERENCES consulta (id) ON DELETE CASCADE,
-    FOREIGN KEY (curso_id)    REFERENCES curso (id),
-    FOREIGN KEY (fuente_id)   REFERENCES fuente (id),
+    FOREIGN KEY (curso_id)    REFERENCES curso (id)
 
     UNIQUE (consulta_id, curso_id)
 );
