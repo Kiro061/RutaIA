@@ -23,7 +23,6 @@ CREATE TABLE curso (
     INDEX idx_curso_activo_nivel (activo, nivel)
 );
 
-
 CREATE TABLE consulta (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     usuario_id     BIGINT   NOT NULL,
@@ -33,7 +32,6 @@ CREATE TABLE consulta (
     -- Índice: historial de un usuario ordenado por fecha
     INDEX idx_consulta_usuario_fecha (usuario_id, fecha_consulta)
 );
-
 
 CREATE TABLE recomendacion (
     id                BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -46,7 +44,6 @@ CREATE TABLE recomendacion (
 
     UNIQUE (consulta_id, curso_id)
 );
-
 
 CREATE TABLE calificacion (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
