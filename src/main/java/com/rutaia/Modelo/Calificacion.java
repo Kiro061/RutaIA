@@ -12,10 +12,13 @@ public class Calificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Recomendacion recomendacion;
+
     @Column(nullable = false)
     private Integer puntuacion;
+
     @Column(length = 500)
     private String comentario;
 }
