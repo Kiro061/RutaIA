@@ -1,6 +1,6 @@
 package com.rutaia.Modelo;
 
-import com.rutaia.Enums.Rol;
+import com.rutaia.Modelo.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

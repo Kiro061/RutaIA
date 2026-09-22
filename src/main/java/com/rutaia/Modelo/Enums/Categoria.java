@@ -1,4 +1,4 @@
-package com.rutaia.Enums;
+package com.rutaia.Modelo.Enums;
 
 public enum Categoria {
     PROGRAMACION,

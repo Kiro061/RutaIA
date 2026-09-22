@@ -1,7 +1,7 @@
 package com.rutaia.Modelo;
 
-import com.rutaia.Enums.Categoria;
-import com.rutaia.Enums.Nivel;
+import com.rutaia.Modelo.Enums.Categoria;
+import com.rutaia.Modelo.Enums.Nivel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
