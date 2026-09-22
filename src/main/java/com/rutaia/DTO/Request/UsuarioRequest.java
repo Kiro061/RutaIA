@@ -1,6 +1,6 @@
 package com.rutaia.DTO.Request;
 
-import com.rutaia.Enums.Rol;
+import com.rutaia.Modelo.Enums.Rol;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
