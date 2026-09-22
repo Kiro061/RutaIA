@@ -8,6 +8,7 @@ import com.rutaia.Modelo.Usuario;
 import com.rutaia.Repository.UsuarioRepository;
 import com.rutaia.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +19,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository usuarioRepository;
-
+    private final PasswordEncoder passwordEncoder;
     @Override
     public UsuarioResponse guardar(UsuarioRequest dto) {
+
+
         Usuario usuario = usuarioMapper.dtoToEntity(dto);
+        usuario.setPassword(passwordEncoder.encode(dto.password()));
         return usuarioMapper.entityToDto(usuarioRepository.save(usuario));
 
     }
@@ -69,6 +73,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponse actualizar(UsuarioRequest dto, Long id) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(()-> new RuntimeException("El usuario no existe"));
         usuarioMapper.updateDtoToEntity(dto, usuario);
+        //Password is encoded
+        usuario.setPassword(passwordEncoder.encode(dto.password()));
         return usuarioMapper.entityToDto(usuarioRepository.save(usuario));
     }
 

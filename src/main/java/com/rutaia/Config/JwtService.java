@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Service // Lo marco como servicio porque será usado para generar y validar tokens
 public class JwtService {
-    private final String SECRET = "KMAVMTSVP_1000";
+    private final String SECRET = "Violent_matikanetacohaouser_the_third-Still_In_love-Maru";
     private final long EXPIRATION = 1000 * 60 * 30; // 30 minutos
 
     private Key getKey() {

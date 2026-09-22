@@ -2,8 +2,10 @@ package com.rutaia.Auth;
 
 import com.rutaia.Config.JwtService;
 import com.rutaia.DTO.Response.UsuarioResponse;
+import com.rutaia.Exception.BuisnessRuleException;
 import com.rutaia.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody LoginRequest request) {
@@ -25,14 +28,20 @@ public class AuthController {
         try {
             usuario = usuarioService.buscarPorCorreo(request.usuario());
         } catch (Exception e) {
-            throw new RuntimeException("Credenciales inválidas");
+            throw new BuisnessRuleException("Credenciales inválidas");
+        }
+        if(!passwordEncoder.matches(request.contrasenia(), usuario.password())){
+            throw new BuisnessRuleException("Credenciales inválidas");
         }
 
-        if (!request.contrasenia().equals(usuario.password())) {
-            throw new RuntimeException("Credenciales inválidas");
+
+        try{
+            String token = jwtService.generateToken(request.usuario());
+            return Map.of("token", token);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
 
-        String token = jwtService.generateToken(usuario.correo());
-        return Map.of("token", token);
+        return Map.of("token", "hubo error");
     }
 }
