@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Consulta | RutaIA</title>
+
+    <link rel="stylesheet" href="../css/consulta.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo">
+            <a href="../index.html">RutaIA</a>
+        </div>
+
+        <nav class="nav-links">
+            <a href="../index.html">Inicio</a>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="consulta.html" class="active">Consulta</a>
+            <a href="login.html" class="btn-nav">Iniciar sesión</a>
+        </nav>
+
+    </header>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="consulta-container">
+
+        <!-- ENCABEZADO -->
+        <section class="consulta-header">
+
+            <h1>¿Qué quieres aprender?</h1>
+
+            <p>
+                Cuéntale a RutaIA qué necesitas aprender y encuentra
+                cursos relacionados con tu interés.
+            </p>
+
+        </section>
+
+
+        <!-- CHAT -->
+        <section class="chat-container">
+
+            <!-- MENSAJES -->
+            <div id="mensajes" class="mensajes">
+
+                <!-- MENSAJE INICIAL -->
+                <div class="mensaje bot">
+
+                    <div class="burbuja">
+
+                        <p>
+                            ¡Hola! Soy RutaIA 👋
+                        </p>
+
+                        <p>
+                            Cuéntame qué quieres aprender o qué tema
+                            necesitas reforzar.
+                        </p>
+
+                        <p class="ejemplo">
+                            Ejemplo: "Quiero aprender a crear páginas web
+                            desde cero".
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORMULARIO DE CONSULTA -->
+            <form id="formConsulta" class="form-consulta">
+
+                <textarea
+                    id="inputConsulta"
+                    rows="1"
+                    placeholder="Escribe qué quieres aprender..."
+                    required></textarea>
+
+                <button type="submit" id="btnConsultar">
+                    Consultar
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <p>
+            © 2026 RutaIA - Sistema inteligente de recomendación de cursos
+        </p>
+
+    </footer>
+
+
+    <script src="../js/consulta.js"></script>
+
+</body>
+
+</html>

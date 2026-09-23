@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registro - RutaIA</title>
+
+    <link rel="stylesheet" href="../css/registro.css">
+</head>
+
+<body>
+
+<main class="registro-container">
+
+    <section class="registro-card">
+
+        <div class="logo">
+            <span>Ruta</span><strong>IA</strong>
+        </div>
+
+        <h1>Crear cuenta</h1>
+
+        <p class="subtitulo">
+            Regístrate para comenzar tu ruta de aprendizaje
+        </p>
+
+        <form id="registroForm">
+
+            <!-- NOMBRE COMPLETO -->
+            <div class="campo">
+
+                <label for="nombreCompleto">
+                    Nombre completo
+                </label>
+
+                <input
+                    type="text"
+                    id="nombreCompleto"
+                    name="nombreCompleto"
+                    placeholder="Ingresa tu nombre completo"
+                    required
+                >
+
+                <span class="error" id="nombreError"></span>
+
+            </div>
+
+
+            <!-- CORREO -->
+            <div class="campo">
+
+                <label for="correo">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    placeholder="ejemplo@correo.com"
+                    required
+                >
+
+                <span class="error" id="correoError"></span>
+
+            </div>
+
+
+            <!-- NIVEL DE EXPERIENCIA -->
+            <div class="campo">
+
+                <label for="nivelExperiencia">
+                    Nivel de experiencia
+                </label>
+
+                <select
+                    id="nivelExperiencia"
+                    name="nivelExperiencia"
+                    required
+                >
+
+                    <option value="">
+                        Selecciona tu nivel
+                    </option>
+
+                    <option value="PRINCIPIANTE">
+                        Principiante
+                    </option>
+
+                    <option value="INTERMEDIO">
+                        Intermedio
+                    </option>
+
+                    <option value="AVANZADO">
+                        Avanzado
+                    </option>
+
+                </select>
+
+                <span class="error" id="nivelError"></span>
+
+            </div>
+
+
+            <!-- ÁREA DE INTERÉS -->
+            <div class="campo">
+
+                <label for="areaInteres">
+                    Área de interés
+                </label>
+
+                <input
+                    type="text"
+                    id="areaInteres"
+                    name="areaInteres"
+                    placeholder="Ej: Programación, IA, Bases de datos..."
+                    required
+                >
+
+                <span class="error" id="areaError"></span>
+
+            </div>
+
+
+            <!-- MENSAJE GENERAL -->
+            <div
+                id="mensaje"
+                class="mensaje"
+            ></div>
+
+
+            <!-- BOTÓN -->
+            <button
+                type="submit"
+                id="btnRegistrar"
+                class="btn-registrar"
+            >
+                Crear cuenta
+            </button>
+
+        </form>
+
+
+        <p class="login-text">
+
+            ¿Ya tienes una cuenta?
+
+            <a href="login.html">
+                Iniciar sesión
+            </a>
+
+        </p>
+
+    </section>
+
+</main>
+
+
+<script src="../js/registro.js"></script>
+
+</body>
+</html>
+
