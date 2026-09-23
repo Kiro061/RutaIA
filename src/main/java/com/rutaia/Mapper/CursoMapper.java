@@ -18,7 +18,8 @@ public class CursoMapper {
                 curso.getDescripcion(),
                 String.valueOf(curso.getCategoria()),
                 String.valueOf(curso.getNivel()),
-                curso.isActivo()
+                curso.isActivo(),
+                curso.getDuracion()
         );
     }
 
@@ -28,7 +29,7 @@ public class CursoMapper {
         Curso curso = new Curso();
         curso.setNombre(dto.nombre());
         curso.setDescripcion(dto.descripcion());
-
+        curso.setDuracion(dto.duracion());
         try {
             curso.setCategoria(Categoria.valueOf(dto.categoria().toUpperCase()));
         }catch (Exception e){
@@ -49,6 +50,7 @@ public class CursoMapper {
 
         curso.setNombre(dto.nombre());
         curso.setDescripcion(dto.descripcion());
+        curso.setDuracion(dto.duracion());
 
         try {
             curso.setCategoria(Categoria.valueOf(dto.categoria().toUpperCase()));

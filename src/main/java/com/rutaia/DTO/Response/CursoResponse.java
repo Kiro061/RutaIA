@@ -6,7 +6,8 @@ public record CursoResponse(
     String descripcion,
     String categoria,
     String nivel,
-    Boolean activo
+    Boolean activo,
+    String duracion
 
 ) {
 }

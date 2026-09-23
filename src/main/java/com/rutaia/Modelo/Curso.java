@@ -32,4 +32,7 @@ public class Curso {
 
     @Column(nullable = false)
     private boolean activo;
+
+    @Column
+    private String duracion;
 }

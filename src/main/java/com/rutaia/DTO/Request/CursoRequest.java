@@ -24,6 +24,11 @@ public record CursoRequest(
         @NotNull(message = "el nivel no puede ser nulo")
         String nivel,
 
-        Boolean activo
+        Boolean activo,
+
+        @NotBlank(message = "La duracion no puede ser vacia")
+        @NotNull(message = "La duracion no puede ser nula")
+        @Size(min = 1, max = 150, message = "la duracion debe tener entre 1 y 150 caracteres")
+        String duracion
 ) {
 }
