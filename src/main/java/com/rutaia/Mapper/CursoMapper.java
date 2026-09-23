@@ -6,7 +6,9 @@ import com.rutaia.Exception.BuisnessRuleException;
 import com.rutaia.Modelo.Curso;
 import com.rutaia.Modelo.Enums.Categoria;
 import com.rutaia.Modelo.Enums.Nivel;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CursoMapper {
 
     public CursoResponse entityToDto(Curso curso){
