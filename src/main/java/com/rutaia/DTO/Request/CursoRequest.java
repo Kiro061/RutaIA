@@ -1,4 +1,29 @@
 package com.rutaia.DTO.Request;
 
-public record CursoRequest() {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record CursoRequest(
+        @NotBlank(message = "el nombre no puede ser vacio")
+        @NotNull(message = "el nombre no puede ser nulo")
+        @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
+        String nombre,
+
+        @NotBlank(message = "el nombre no puede ser vacio")
+        @NotNull(message = "el nombre no puede ser nulo")
+        @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
+        String categoria,
+
+        @NotBlank(message = "el nombre no puede ser vacio")
+        @NotNull(message = "el nombre no puede ser nulo")
+        @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
+        String descripcion,
+
+        @NotBlank(message = "el nivel no puede ser vacio")
+        @NotNull(message = "el nivel no puede ser nulo")
+        String nivel,
+
+        Boolean activo
+) {
 }

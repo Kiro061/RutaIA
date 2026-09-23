@@ -31,5 +31,5 @@ public class Curso {
     private Nivel nivel;
 
     @Column(nullable = false)
-    private boolean activo = true;
+    private boolean activo;
 }
