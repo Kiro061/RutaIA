@@ -10,6 +10,7 @@ public interface CursoService {
     CursoResponse actualizarCurso(Long id, CursoRequest dto);
     void eliminarCurso(Long id);
     CursoResponse buscarCursoId(Long id);
+    List<CursoResponse> listarTodos();
     List<CursoResponse> buscarCursoNombreSimilar(String nombre);
     List<CursoResponse> buscarCursoDescripcionSimilar(String descripcion);
     List<CursoResponse> buscarCursoCategoria(String categoria);

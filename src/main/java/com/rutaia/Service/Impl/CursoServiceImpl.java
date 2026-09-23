@@ -47,6 +47,11 @@ public class CursoServiceImpl implements CursoService {
     }
 
     @Override
+    public List<CursoResponse> listarTodos() {
+        return cursoReporitory.findAll().stream().map(cursoMapper::entityToDto).toList();
+    }
+
+    @Override
     public List<CursoResponse> buscarCursoNombreSimilar(String nombre) {
         return cursoReporitory.findByNombreContaining(nombre).stream().map(
                 cursoMapper::entityToDto

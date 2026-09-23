@@ -36,6 +36,11 @@ public class CursoController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping
+    public ResponseEntity<List<CursoResponse>> buscarTodos(){
+        return ResponseEntity.status(HttpStatus.OK).body(cursoService.listarTodos());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CursoResponse> buscarCursoId(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(cursoService.buscarCursoId(id));
