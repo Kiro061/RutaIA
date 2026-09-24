@@ -7,7 +7,7 @@ import com.rutaia.Mapper.CursoMapper;
 import com.rutaia.Modelo.Curso;
 import com.rutaia.Modelo.Enums.Categoria;
 import com.rutaia.Modelo.Enums.Nivel;
-import com.rutaia.Repository.CursoReporitory;
+import com.rutaia.Repository.CursoRepository;
 import com.rutaia.Service.CursoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CursoServiceImpl implements CursoService {
 
     private final CursoMapper cursoMapper;
-    private final CursoReporitory cursoReporitory;
+    private final CursoRepository cursoReporitory;
 
     @Override
     public CursoResponse guardarCurso(CursoRequest dto) {
