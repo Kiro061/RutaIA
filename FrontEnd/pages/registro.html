@@ -3,162 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Registro - RutaIA</title>
-
+    <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/registro.css">
 </head>
-
 <body>
 
-<main class="registro-container">
+<header class="navbar" id="navbar">
+    <div class="logo"><a href="../index.html">RutaIA</a></div>
 
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav id="navMenu">
+        <a href="../index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="consulta.html" data-auth-only hidden>Consulta</a>
+        <a href="login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
+
+        <div class="nav-user" data-auth-only hidden>
+            <span class="nav-user-name" id="navUserName"></span>
+            <button class="btn-nav btn-nav--ghost" id="navLogoutBtn">Cerrar sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main class="registro-container">
     <section class="registro-card">
 
-        <div class="logo">
-            <span>Ruta</span><strong>IA</strong>
-        </div>
-
+        <div class="logo-registro"><span>Ruta</span><strong>IA</strong></div>
         <h1>Crear cuenta</h1>
-
-        <p class="subtitulo">
-            Regístrate para comenzar tu ruta de aprendizaje
-        </p>
+        <p class="subtitulo">Regístrate para comenzar a utilizar RutaIA</p>
 
         <form id="registroForm">
-
-            <!-- NOMBRE COMPLETO -->
             <div class="campo">
-
-                <label for="nombreCompleto">
-                    Nombre completo
-                </label>
-
-                <input
-                    type="text"
-                    id="nombreCompleto"
-                    name="nombreCompleto"
-                    placeholder="Ingresa tu nombre completo"
-                    required
-                >
-
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
                 <span class="error" id="nombreError"></span>
-
             </div>
 
-
-            <!-- CORREO -->
             <div class="campo">
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
+                <span class="error" id="apellidoError"></span>
+            </div>
 
-                <label for="correo">
-                    Correo electrónico
-                </label>
-
-                <input
-                    type="email"
-                    id="correo"
-                    name="correo"
-                    placeholder="ejemplo@correo.com"
-                    required
-                >
-
+            <div class="campo">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required>
                 <span class="error" id="correoError"></span>
-
             </div>
 
-
-            <!-- NIVEL DE EXPERIENCIA -->
             <div class="campo">
-
-                <label for="nivelExperiencia">
-                    Nivel de experiencia
-                </label>
-
-                <select
-                    id="nivelExperiencia"
-                    name="nivelExperiencia"
-                    required
-                >
-
-                    <option value="">
-                        Selecciona tu nivel
-                    </option>
-
-                    <option value="PRINCIPIANTE">
-                        Principiante
-                    </option>
-
-                    <option value="INTERMEDIO">
-                        Intermedio
-                    </option>
-
-                    <option value="AVANZADO">
-                        Avanzado
-                    </option>
-
-                </select>
-
-                <span class="error" id="nivelError"></span>
-
+                <label for="password">Contraseña</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="Crea una contraseña" required>
+                    <button type="button" id="mostrarPassword" class="mostrar-password">Mostrar</button>
+                </div>
+                <span class="error" id="passwordError"></span>
             </div>
 
-
-            <!-- ÁREA DE INTERÉS -->
             <div class="campo">
-
-                <label for="areaInteres">
-                    Área de interés
-                </label>
-
-                <input
-                    type="text"
-                    id="areaInteres"
-                    name="areaInteres"
-                    placeholder="Ej: Programación, IA, Bases de datos..."
-                    required
-                >
-
-                <span class="error" id="areaError"></span>
-
+                <label for="confirmarPassword">Confirmar contraseña</label>
+                <div class="password-container">
+                    <input type="password" id="confirmarPassword" name="confirmarPassword" placeholder="Repite tu contraseña" required>
+                    <button type="button" id="mostrarConfirmarPassword" class="mostrar-password">Mostrar</button>
+                </div>
+                <span class="error" id="confirmarPasswordError"></span>
             </div>
 
+            <div id="mensaje" class="mensaje"></div>
 
-            <!-- MENSAJE GENERAL -->
-            <div
-                id="mensaje"
-                class="mensaje"
-            ></div>
-
-
-            <!-- BOTÓN -->
-            <button
-                type="submit"
-                id="btnRegistrar"
-                class="btn-registrar"
-            >
-                Crear cuenta
-            </button>
-
+            <button type="submit" id="btnRegistrar" class="btn-registrar">Crear cuenta</button>
         </form>
 
-
-        <p class="login-text">
-
-            ¿Ya tienes una cuenta?
-
-            <a href="login.html">
-                Iniciar sesión
-            </a>
-
-        </p>
+        <p class="login-text">¿Ya tienes una cuenta? <a href="login.html">Iniciar sesión</a></p>
 
     </section>
-
 </main>
 
-
+<script src="../js/auth.js"></script>
+<script src="../js/navbar.js"></script>
 <script src="../js/registro.js"></script>
-
 </body>
 </html>
-

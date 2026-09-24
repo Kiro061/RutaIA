@@ -1,115 +1,74 @@
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Consulta | RutaIA</title>
-
+    <title>Consulta - RutaIA</title>
+    <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/consulta.css">
 </head>
-
 <body>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
+<script src="../js/auth.js"></script>
+<script>requerirSesion();</script>
 
-        <div class="logo">
-            <a href="../index.html">RutaIA</a>
+<header class="navbar" id="navbar">
+    <div class="logo"><a href="../index.html">RutaIA</a></div>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav id="navMenu">
+        <a href="../index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="consulta.html" class="is-active" data-auth-only hidden>Consulta</a>
+        <a href="login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
+
+        <div class="nav-user" data-auth-only hidden>
+            <span class="nav-user-name" id="navUserName"></span>
+            <button class="btn-nav btn-nav--ghost" id="navLogoutBtn">Cerrar sesión</button>
+        </div>
+    </nav>
+</header>
+
+<div class="chat-app">
+
+    <div class="chat-header">
+        <div>
+            <h1>Asesor RutaIA</h1>
+            <p>Pregunta como le hablarías a un asesor académico</p>
+        </div>
+        <div class="chat-tabs">
+            <button id="tabConsultar" class="active">Consultar</button>
+            <button id="tabHistorial">Historial</button>
+        </div>
+    </div>
+
+    <!-- Vista Consultar -->
+    <div id="vistaConsultar" class="chat-vista">
+        <div id="mensajes" class="mensajes">
+            <div class="msg bot">
+                <div class="burbuja">¡Hola! Cuéntame qué quieres aprender — por ejemplo: "sé Java básico y quiero especializarme en backend con bases de datos".</div>
+            </div>
         </div>
 
-        <nav class="nav-links">
-            <a href="../index.html">Inicio</a>
-            <a href="catalogo.html">Catálogo</a>
-            <a href="consulta.html" class="active">Consulta</a>
-            <a href="login.html" class="btn-nav">Iniciar sesión</a>
-        </nav>
+        <form id="formConsulta" class="chat-form">
+            <textarea id="inputConsulta" rows="1" placeholder="Escribe tu consulta..." required></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
 
-    </header>
+    <!-- Vista Historial -->
+    <div id="vistaHistorial" class="historial-vista" hidden>
+        <div id="historialBox" class="historial-box">
+            <p class="estado">Cargando historial…</p>
+        </div>
+    </div>
 
+</div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="consulta-container">
-
-        <!-- ENCABEZADO -->
-        <section class="consulta-header">
-
-            <h1>¿Qué quieres aprender?</h1>
-
-            <p>
-                Cuéntale a RutaIA qué necesitas aprender y encuentra
-                cursos relacionados con tu interés.
-            </p>
-
-        </section>
-
-
-        <!-- CHAT -->
-        <section class="chat-container">
-
-            <!-- MENSAJES -->
-            <div id="mensajes" class="mensajes">
-
-                <!-- MENSAJE INICIAL -->
-                <div class="mensaje bot">
-
-                    <div class="burbuja">
-
-                        <p>
-                            ¡Hola! Soy RutaIA 👋
-                        </p>
-
-                        <p>
-                            Cuéntame qué quieres aprender o qué tema
-                            necesitas reforzar.
-                        </p>
-
-                        <p class="ejemplo">
-                            Ejemplo: "Quiero aprender a crear páginas web
-                            desde cero".
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- FORMULARIO DE CONSULTA -->
-            <form id="formConsulta" class="form-consulta">
-
-                <textarea
-                    id="inputConsulta"
-                    rows="1"
-                    placeholder="Escribe qué quieres aprender..."
-                    required></textarea>
-
-                <button type="submit" id="btnConsultar">
-                    Consultar
-                </button>
-
-            </form>
-
-        </section>
-
-    </main>
-
-
-    <!-- FOOTER -->
-    <footer class="footer">
-
-        <p>
-            © 2026 RutaIA - Sistema inteligente de recomendación de cursos
-        </p>
-
-    </footer>
-
-
-    <script src="../js/consulta.js"></script>
-
+<script src="../js/navbar.js"></script>
+<script src="../js/consulta.js"></script>
 </body>
-
 </html>

@@ -1,188 +1,67 @@
-// ========================================
-// ELEMENTOS DEL DOM
-// ========================================
+/* =========================================
+   RUTAIA - CATÁLOGO
+========================================= */
 
-const listaCursos =
-    document.getElementById("listaCursos");
+const API_URL = "http://localhost:8080";
 
-const contadorCursos =
-    document.getElementById("contadorCursos");
+let cursosCache = [];
 
-const sinResultados =
-    document.getElementById("sinResultados");
+async function cargarCatalogo() {
+    const grid = document.getElementById("catalogoGrid");
+    grid.innerHTML = '<p class="catalogo-estado">Cargando catálogo…</p>';
 
-const filtroCategoria =
-    document.getElementById("filtroCategoria");
+    try {
+        const respuesta = await fetch(`${API_URL}/api/cursos`);
+        const datos = await respuesta.json();
 
-const filtroNivel =
-    document.getElementById("filtroNivel");
+        if (!respuesta.ok) {
+            throw new Error(datos.mensaje || datos.message || "No fue posible cargar el catálogo.");
+        }
 
+        cursosCache = Array.isArray(datos) ? datos : [];
+        renderCursos(cursosCache);
 
-// ========================================
-// MOSTRAR CURSOS
-// ========================================
+    } catch (error) {
+        console.error("Error al cargar catálogo:", error);
+        grid.innerHTML = `<p class="catalogo-estado">${error.message}</p>`;
+    }
+}
 
-function mostrarCursos(cursos) {
+function renderCursos(cursos) {
+    const grid = document.getElementById("catalogoGrid");
+    grid.innerHTML = "";
 
-    listaCursos.innerHTML = "";
-
-
-    contadorCursos.textContent =
-        `${cursos.length} curso${cursos.length !== 1 ? "s" : ""}`;
-
-
-    if (cursos.length === 0) {
-
-        sinResultados.style.display = "block";
-
+    if (!cursos.length) {
+        grid.innerHTML = '<p class="catalogo-estado">No hay cursos que coincidan con tu búsqueda.</p>';
         return;
     }
 
-
-    sinResultados.style.display = "none";
-
-
-    cursos.forEach(curso => {
-
-        const tarjeta =
-            document.createElement("article");
-
-        tarjeta.classList.add("curso-card");
-
-
-        tarjeta.innerHTML = `
-
-            <span class="categoria">
-                ${curso.categoria}
-            </span>
-
-            <h3>
-                ${curso.nombre}
-            </h3>
-
-            <p class="descripcion">
-                ${curso.descripcion}
-            </p>
-
-            <div class="curso-info">
-
-                <span>
-                    Nivel:
-                    ${curso.nivel}
-                </span>
-
-                <span>
-                    Duración:
-                    ${curso.duracion}
-                </span>
-
+    cursos.forEach((curso) => {
+        const card = document.createElement("article");
+        card.className = "curso-card";
+        card.innerHTML = `
+            <span class="categoria">${curso.categoria || "General"}</span>
+            <h3>${curso.nombre || "Curso sin nombre"}</h3>
+            <p>${curso.descripcion || ""}</p>
+            <div class="meta">
+                <span>${curso.nivel || ""}</span>
+                <span>${curso.duracionHoras ? curso.duracionHoras + " h" : ""}</span>
             </div>
-
         `;
-
-
-        listaCursos.appendChild(tarjeta);
-
+        grid.appendChild(card);
     });
-
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    cargarCatalogo();
 
-// ========================================
-// FILTRAR CURSOS
-// ========================================
+    document.getElementById("buscador").addEventListener("input", (evento) => {
+        const termino = evento.target.value.trim().toLowerCase();
+        if (!termino) return renderCursos(cursosCache);
 
-function filtrarCursos(cursos) {
-
-    const categoriaSeleccionada =
-        filtroCategoria.value;
-
-    const nivelSeleccionado =
-        filtroNivel.value;
-
-
-    const cursosFiltrados =
-        cursos.filter(curso => {
-
-            const coincideCategoria =
-                categoriaSeleccionada === "" ||
-                curso.categoria === categoriaSeleccionada;
-
-
-            const coincideNivel =
-                nivelSeleccionado === "" ||
-                curso.nivel === nivelSeleccionado;
-
-
-            return (
-                coincideCategoria &&
-                coincideNivel
-            );
-
-        });
-
-
-    mostrarCursos(cursosFiltrados);
-}
-
-
-// ========================================
-// EVENTOS DE FILTROS
-// ========================================
-
-filtroCategoria.addEventListener(
-    "change",
-    () => {
-
-        /*
-         * Cuando conectes Spring Boot,
-         * aquí puedes volver a ejecutar
-         * el filtrado de los cursos.
-         */
-
-    }
-);
-
-
-filtroNivel.addEventListener(
-    "change",
-    () => {
-
-        /*
-         * Cuando conectes Spring Boot,
-         * aquí puedes volver a ejecutar
-         * el filtrado de los cursos.
-         */
-
-    }
-);
-
-
-// ========================================
-// FUNCIÓN PARA CARGAR CURSOS
-// ========================================
-
-function cargarCursos(cursos) {
-
-    /*
-     * Esta función está preparada para
-     * recibir los cursos provenientes
-     * del backend.
-     *
-     * El backend deberá enviar únicamente
-     * los cursos que estén activos.
-     */
-
-    mostrarCursos(cursos);
-}
-
-
-// ========================================
-// INICIO
-// ========================================
-
-/*
- * No se cargan cursos todavía porque
- * el frontend aún no está conectado
- * con Spring Boot.
- */
+        renderCursos(cursosCache.filter((c) =>
+            (c.nombre || "").toLowerCase().includes(termino) ||
+            (c.categoria || "").toLowerCase().includes(termino)
+        ));
+    });
+});

@@ -1,224 +1,293 @@
-// =========================================
-// ELEMENTOS DEL DOM
-// =========================================
+/* =========================================
+   RUTAIA - CHATBOT DE CONSULTA
+   (mismo patrón que el ejemplo de clase:
+   tabs, burbujas, tarjetas sugeridas)
+========================================= */
 
-const mensajes = document.getElementById("mensajes");
+const API_URL = "http://localhost:8080";
+
+/* --- Tabs --- */
+
+const tabConsultar = document.getElementById("tabConsultar");
+const tabHistorial = document.getElementById("tabHistorial");
+const vistaConsultar = document.getElementById("vistaConsultar");
+const vistaHistorial = document.getElementById("vistaHistorial");
+
+let historialCargado = false;
+
+tabConsultar.addEventListener("click", () => {
+    tabConsultar.classList.add("active");
+    tabHistorial.classList.remove("active");
+    vistaConsultar.hidden = false;
+    vistaHistorial.hidden = true;
+});
+
+tabHistorial.addEventListener("click", () => {
+    tabHistorial.classList.add("active");
+    tabConsultar.classList.remove("active");
+    vistaHistorial.hidden = false;
+    vistaConsultar.hidden = true;
+    if (!historialCargado) cargarHistorial();
+});
+
+/* --- Chat --- */
+
+const mensajesEl = document.getElementById("mensajes");
 const formConsulta = document.getElementById("formConsulta");
 const inputConsulta = document.getElementById("inputConsulta");
-const btnConsultar = document.getElementById("btnConsultar");
 
-
-// =========================================
-// AGREGAR MENSAJE AL CHAT
-// =========================================
+function manejarNoAutorizado(respuesta) {
+    if (respuesta.status === 401) {
+        cerrarSesion();
+        return true;
+    }
+    return false;
+}
 
 function agregarMensaje(tipo, texto) {
-
-    const mensaje = document.createElement("div");
-
-    mensaje.classList.add("mensaje", tipo);
-
+    const div = document.createElement("div");
+    div.className = "msg " + tipo;
 
     const burbuja = document.createElement("div");
-
-    burbuja.classList.add("burbuja");
-
+    burbuja.className = "burbuja";
     burbuja.textContent = texto;
+    div.appendChild(burbuja);
 
-
-    mensaje.appendChild(burbuja);
-
-    mensajes.appendChild(mensaje);
-
-
-    // Llevar el scroll hasta el último mensaje
-
-    mensajes.scrollTop = mensajes.scrollHeight;
+    mensajesEl.appendChild(div);
+    mensajesEl.scrollTop = mensajesEl.scrollHeight;
+    return div;
 }
 
+function agregarRespuestaBot(consulta) {
+    const div = document.createElement("div");
+    div.className = "msg bot";
 
-// =========================================
-// MOSTRAR CURSOS RECOMENDADOS
-// =========================================
+    const burbuja = document.createElement("div");
+    burbuja.className = "burbuja";
+    burbuja.textContent = "Esto es lo que encontré para ti:";
+    div.appendChild(burbuja);
 
-function mostrarCursos(cursos) {
+    const recomendaciones = consulta.recomendaciones || [];
+    if (recomendaciones.length) {
+        const cont = document.createElement("div");
+        cont.className = "sugeridos";
+        recomendaciones.forEach((rec) => {
+            const item = document.createElement("div");
+            item.className = "sugerido";
+            item.innerHTML = `<strong>${rec.nombreCurso || "Curso recomendado"}</strong><br>${rec.justificacion || ""}`;
+            cont.appendChild(item);
+        });
+        div.appendChild(cont);
+    } else {
+        burbuja.textContent = "No encontré una recomendación para esta consulta.";
+    }
 
-    const mensaje = document.createElement("div");
+    const fuentes = consulta.fuentes || [];
+    if (fuentes.length) {
+        const fcont = document.createElement("div");
+        fcont.className = "fuentes";
+        fcont.innerHTML = '<span class="fuentes-titulo">Fuentes</span>';
+        fuentes.forEach((f) => {
+            const item = document.createElement("div");
+            item.className = "fuente";
+            item.textContent = f.descripcion || "";
+            fcont.appendChild(item);
+        });
+        div.appendChild(fcont);
+    }
 
-    mensaje.classList.add("mensaje", "bot");
+    if (recomendaciones.length) {
+        div.appendChild(construirCalificacion(consulta));
+    }
 
+    mensajesEl.appendChild(div);
+    mensajesEl.scrollTop = mensajesEl.scrollHeight;
+    return div;
+}
 
-    const contenido = document.createElement("div");
+function construirCalificacion(consulta) {
+    const box = document.createElement("div");
+    box.className = "calificacion";
 
-    contenido.classList.add("burbuja");
+    if (consulta.calificacion) {
+        box.innerHTML = `
+            <span class="calificacion-titulo">Tu calificación</span>
+            <p class="calificacion-enviada">${consulta.calificacion.valor} de 5</p>
+        `;
+        return box;
+    }
 
+    box.innerHTML = `
+        <span class="calificacion-titulo">¿Qué tan útil fue esta recomendación?</span>
+        <div class="estrellas"></div>
+        <textarea rows="2" placeholder="Comentario opcional…"></textarea>
+        <button type="button">Enviar calificación</button>
+    `;
 
-    const titulo = document.createElement("p");
+    const estrellasBox = box.querySelector(".estrellas");
+    let seleccion = 0;
 
-    titulo.textContent = "Estos cursos podrían ayudarte:";
+    for (let i = 1; i <= 5; i++) {
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "estrella";
+        boton.textContent = "★";
+        boton.addEventListener("click", () => {
+            seleccion = i;
+            estrellasBox.querySelectorAll(".estrella").forEach((el, idx) => {
+                el.classList.toggle("activa", idx < seleccion);
+            });
+        });
+        estrellasBox.appendChild(boton);
+    }
 
-    contenido.appendChild(titulo);
+    box.querySelector("button:not(.estrella)").addEventListener("click", async (evento) => {
+        if (!seleccion) return;
+        const boton = evento.target;
+        boton.disabled = true;
 
+        try {
+            const comentario = box.querySelector("textarea").value.trim();
+            const respuesta = await fetch(`${API_URL}/api/consultas/${consulta.id}/calificacion`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${obtenerToken()}`
+                },
+                body: JSON.stringify({ valor: seleccion, comentario })
+            });
 
-    const contenedorCursos = document.createElement("div");
+            if (manejarNoAutorizado(respuesta)) return;
+            if (!respuesta.ok) throw new Error("No fue posible enviar la calificación.");
 
-    contenedorCursos.classList.add("cursos-recomendados");
+            box.innerHTML = `
+                <span class="calificacion-titulo">Tu calificación</span>
+                <p class="calificacion-enviada">${seleccion} de 5. ¡Gracias!</p>
+            `;
 
-
-    cursos.forEach(curso => {
-
-        const tarjeta = document.createElement("div");
-
-        tarjeta.classList.add("curso-recomendado");
-
-
-        const nombre = document.createElement("h3");
-
-        nombre.textContent = curso.nombre;
-
-
-        const descripcion = document.createElement("p");
-
-        descripcion.textContent = curso.descripcion;
-
-
-        const informacion = document.createElement("div");
-
-        informacion.classList.add("curso-info");
-
-
-        const nivel = document.createElement("span");
-
-        nivel.textContent = curso.nivel;
-
-
-        const duracion = document.createElement("span");
-
-        duracion.textContent = curso.duracion;
-
-
-        informacion.appendChild(nivel);
-
-        informacion.appendChild(duracion);
-
-
-        tarjeta.appendChild(nombre);
-
-        tarjeta.appendChild(descripcion);
-
-        tarjeta.appendChild(informacion);
-
-
-        contenedorCursos.appendChild(tarjeta);
-
+        } catch (error) {
+            console.error(error);
+            boton.disabled = false;
+        }
     });
 
-
-    contenido.appendChild(contenedorCursos);
-
-    mensaje.appendChild(contenido);
-
-    mensajes.appendChild(mensaje);
-
-
-    mensajes.scrollTop = mensajes.scrollHeight;
+    return box;
 }
 
-
-// =========================================
-// ENVIAR CONSULTA
-// =========================================
-
-formConsulta.addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
+formConsulta.addEventListener("submit", async (evento) => {
+    evento.preventDefault();
 
     const consulta = inputConsulta.value.trim();
+    if (!consulta) return;
 
-
-    // Evitar consultas vacías
-
-    if (consulta === "") {
-        return;
-    }
-
-
-    // Mostrar mensaje del usuario
-
-    agregarMensaje("usuario", consulta);
-
-
-    // Limpiar campo
-
+    agregarMensaje("user", consulta);
     inputConsulta.value = "";
 
+    const cargando = agregarMensaje("bot", "Buscando en el catálogo académico...");
+    cargando.classList.add("cargando");
 
-    // Preparar botón
+    formConsulta.querySelector("button").disabled = true;
 
-    btnConsultar.disabled = true;
+    try {
+        const respuesta = await fetch(`${API_URL}/api/consultas`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${obtenerToken()}`
+            },
+            body: JSON.stringify({ textoConsulta: consulta })
+        });
 
-    btnConsultar.textContent = "Consultando...";
+        cargando.remove();
 
+        if (manejarNoAutorizado(respuesta)) return;
 
-    /*
-        ============================================
-        CONEXIÓN CON EL BACKEND
+        const datos = await respuesta.json();
+        if (!respuesta.ok) throw new Error(datos.mensaje || datos.message || "No fue posible procesar la consulta.");
 
-        La conexión con Spring Boot se agregará
-        posteriormente.
+        agregarRespuestaBot(datos);
 
-        En este momento solamente mostramos una
-        respuesta temporal para comprobar que
-        la interfaz funciona correctamente.
-        ============================================
-    */
-
-
-    setTimeout(function() {
-
-        agregarMensaje(
-            "bot",
-            "Tu consulta fue recibida. Aquí se mostrarán las recomendaciones de cursos cuando conectemos el frontend con la API."
-        );
-
-
-        btnConsultar.disabled = false;
-
-        btnConsultar.textContent = "Consultar";
-
-    }, 700);
-
-});
-
-
-// =========================================
-// ENTER PARA ENVIAR
-// =========================================
-
-inputConsulta.addEventListener("keydown", function(event) {
-
-    // Enter envía la consulta
-
-    if (event.key === "Enter" && !event.shiftKey) {
-
-        event.preventDefault();
-
-        formConsulta.requestSubmit();
-
+    } catch (error) {
+        cargando.remove();
+        agregarMensaje("bot", "Ocurrió un error: " + error.message);
+    } finally {
+        formConsulta.querySelector("button").disabled = false;
     }
-
 });
 
-
-// =========================================
-// AJUSTAR ALTURA DEL TEXTAREA
-// =========================================
-
-inputConsulta.addEventListener("input", function() {
-
-    this.style.height = "auto";
-
-    this.style.height = this.scrollHeight + "px";
-
+/* Enviar con Enter (Shift+Enter para salto de línea) */
+inputConsulta.addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter" && !evento.shiftKey) {
+        evento.preventDefault();
+        formConsulta.requestSubmit();
+    }
 });
+
+/* --- Historial --- */
+
+async function cargarHistorial() {
+    const historialBox = document.getElementById("historialBox");
+
+    try {
+        const respuesta = await fetch(`${API_URL}/api/consultas`, {
+            headers: { "Authorization": `Bearer ${obtenerToken()}` }
+        });
+
+        if (manejarNoAutorizado(respuesta)) return;
+
+        const consultas = await respuesta.json();
+        historialBox.innerHTML = "";
+        historialCargado = true;
+
+        if (!Array.isArray(consultas) || !consultas.length) {
+            historialBox.innerHTML = '<p class="estado">Aún no has hecho ninguna consulta.</p>';
+            return;
+        }
+
+        consultas
+            .slice()
+            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+            .forEach((consulta) => {
+                const item = document.createElement("div");
+                item.className = "historial-item";
+                item.innerHTML = `
+                    <button type="button" class="historial-item-header">
+                        <span class="fecha">${consulta.fecha ? new Date(consulta.fecha).toLocaleString("es-CO") : ""}</span>
+                        <span class="texto">${consulta.textoConsulta || ""}</span>
+                    </button>
+                    <div class="historial-item-body" hidden></div>
+                `;
+
+                const boton = item.querySelector(".historial-item-header");
+                const body = item.querySelector(".historial-item-body");
+                let renderizado = false;
+
+                boton.addEventListener("click", () => {
+                    body.hidden = !body.hidden;
+                    if (!body.hidden && !renderizado) {
+                        const respuestaBot = document.createElement("div");
+                        respuestaBot.className = "msg bot";
+                        respuestaBot.style.maxWidth = "100%";
+                        body.appendChild(respuestaBot);
+                        body.replaceChild(agregarRespuestaBotEnNodo(consulta), respuestaBot);
+                        renderizado = true;
+                    }
+                });
+
+                historialBox.appendChild(item);
+            });
+
+    } catch (error) {
+        console.error(error);
+        historialBox.innerHTML = `<p class="estado">${error.message}</p>`;
+    }
+}
+
+/* Reutiliza agregarRespuestaBot pero sin insertarlo en #mensajes,
+   para poder colocarlo dentro de un ítem del historial. */
+function agregarRespuestaBotEnNodo(consulta) {
+    const antes = mensajesEl.lastElementChild;
+    const nodo = agregarRespuestaBot(consulta);
+    mensajesEl.removeChild(nodo);
+    return nodo;
+}

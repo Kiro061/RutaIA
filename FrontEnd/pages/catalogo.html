@@ -1,240 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>RutaIA | Catálogo de cursos</title>
-
-    <link rel="stylesheet"
-          href="../css/catalogo.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - RutaIA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/catalogo.css">
 </head>
-
 <body>
 
-<header class="navbar">
+<header class="navbar" id="navbar">
+    <div class="logo"><a href="../index.html">RutaIA</a></div>
 
-    <div class="logo">
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
 
-        <a href="../index.html">
-            <span>Ruta</span><strong>IA</strong>
-        </a>
+    <nav id="navMenu">
+        <a href="../index.html">Inicio</a>
+        <a href="catalogo.html" class="is-active">Catálogo</a>
+        <a href="consulta.html" data-auth-only hidden>Consulta</a>
+        <a href="login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
 
-    </div>
-
-    <nav>
-
-        <a href="../index.html">
-            Inicio
-        </a>
-
-        <a href="catalogo.html" class="activo">
-            Catálogo
-        </a>
-
-        <a href="consulta.html">
-            Consulta
-        </a>
-
-        <a href="login.html" class="btn-nav">
-            Iniciar sesión
-        </a>
-
+        <div class="nav-user" data-auth-only hidden>
+            <span class="nav-user-name" id="navUserName"></span>
+            <button class="btn-nav btn-nav--ghost" id="navLogoutBtn">Cerrar sesión</button>
+        </div>
     </nav>
-
 </header>
 
-
-<main>
-
-    <!-- ENCABEZADO -->
-
-    <section class="catalogo-header">
-
-        <div class="header-content">
-
-            <span class="section-tag">
-                RutaIA
-            </span>
-
-            <h1>
-                Catálogo de cursos
-            </h1>
-
-            <p>
-                Explora los cursos disponibles y encuentra
-                oportunidades de aprendizaje según tus intereses.
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <!-- FILTROS -->
-
-    <section class="filtros-container">
-
-        <div class="filtro">
-
-            <label for="filtroCategoria">
-                Categoría
-            </label>
-
-            <select id="filtroCategoria">
-
-                <option value="">
-                    Todas las categorías
-                </option>
-
-                <!--
-                    Las categorías serán cargadas
-                    posteriormente desde el backend.
-                -->
-
-            </select>
-
-        </div>
-
-
-        <div class="filtro">
-
-            <label for="filtroNivel">
-                Nivel
-            </label>
-
-            <select id="filtroNivel">
-
-                <option value="">
-                    Todos los niveles
-                </option>
-
-                <option value="PRINCIPIANTE">
-                    Principiante
-                </option>
-
-                <option value="INTERMEDIO">
-                    Intermedio
-                </option>
-
-                <option value="AVANZADO">
-                    Avanzado
-                </option>
-
-            </select>
-
-        </div>
-
-    </section>
-
-
-    <!-- CATÁLOGO -->
-
-    <section class="catalogo">
-
-        <div class="catalogo-header-info">
-
-            <div>
-
-                <span class="section-tag">
-                    Cursos disponibles
-                </span>
-
-                <h2>
-                    Explora nuestra oferta académica
-                </h2>
-
-            </div>
-
-            <span id="contadorCursos">
-                Cursos disponibles
-            </span>
-
-        </div>
-
-
-        <!--
-            Los cursos serán agregados posteriormente
-            mediante JavaScript a partir de la API.
-        -->
-
-        <div
-            id="listaCursos"
-            class="cursos-grid"
-        >
-
-        </div>
-
-
-        <!-- MENSAJE SIN RESULTADOS -->
-
-        <div
-            id="sinResultados"
-            class="sin-resultados"
-        >
-
-            <div class="sin-resultados-icon">
-                ?
-            </div>
-
-            <h3>
-                No encontramos cursos
-            </h3>
-
-            <p>
-                Intenta cambiar los filtros seleccionados.
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <!-- CTA -->
-
-    <section class="cta">
-
-        <div>
-
-            <h2>
-                ¿No sabes qué curso necesitas?
-            </h2>
-
-            <p>
-                Describe lo que quieres aprender y RutaIA
-                te ayudará a encontrar cursos relacionados.
-            </p>
-
-        </div>
-
-        <a href="consulta.html"
-           class="btn-primary">
-
-            Realizar consulta
-
-        </a>
-
-    </section>
-
+<main class="section">
+    <div class="section-header">
+        <span class="section-tag">RutaIA</span>
+        <h2>Catálogo de cursos</h2>
+        <p>Explora los cursos disponibles en la institución.</p>
+    </div>
+
+    <div class="catalogo-toolbar">
+        <input type="search" id="buscador" placeholder="Buscar por nombre o categoría…">
+    </div>
+
+    <div class="catalogo-grid" id="catalogoGrid">
+        <p class="catalogo-estado">Cargando catálogo…</p>
+    </div>
 </main>
 
-
 <footer>
-
-    <p>
-        © 2026 RutaIA — Plataforma de recomendación académica
-    </p>
-
+    <p>© 2026 RutaIA — Plataforma de recomendación académica</p>
 </footer>
 
-
+<script src="../js/auth.js"></script>
+<script src="../js/navbar.js"></script>
 <script src="../js/catalogo.js"></script>
-
 </body>
-
 </html>
