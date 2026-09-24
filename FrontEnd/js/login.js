@@ -1,12 +1,13 @@
 /* =========================================
    RUTAIA - LOGIN
 ========================================= */
+
 /* =========================================
    URL DE LA API
 ========================================= */
 
+const API_URL = "http://172.16.102.4:8080/rutaia/api/v1";
 
-const API_URL = "http://localhost:8080";
 
 /* =========================================
    ESPERAR A QUE CARGUE EL DOM
@@ -14,17 +15,13 @@ const API_URL = "http://localhost:8080";
 
 document.addEventListener("DOMContentLoaded", () => {
 
-
     /* =====================================
        OBTENER ELEMENTOS
     ===================================== */
 
     const loginForm = document.getElementById("loginForm");
-
     const correoInput = document.getElementById("correo");
-
     const passwordInput = document.getElementById("password");
-
     const loginMessage = document.getElementById("loginMessage");
 
 
@@ -61,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ================================= */
 
         const correo = correoInput.value.trim();
-
         const password = passwordInput.value;
 
 
@@ -87,12 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const boton = loginForm.querySelector("button");
 
         boton.disabled = true;
-
         boton.textContent = "Iniciando sesión...";
 
 
         try {
-
 
             /* =============================
                PETICIÓN A SPRING BOOT
@@ -101,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const respuesta = await fetch(
                 `${API_URL}/auth/login`,
                 {
-
                     method: "POST",
 
                     headers: {
@@ -109,10 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
 
                     body: JSON.stringify({
-                        correo: correo,
-                        password: password
+                        usuario: correo,
+                        contrasenia: password
                     })
-
                 }
             );
 
@@ -123,6 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const datos = await respuesta.json();
 
+            console.log("Respuesta del servidor:", datos);
+
 
             /* =============================
                LOGIN EXITOSO
@@ -130,11 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (respuesta.ok) {
 
-
-                /*
-                 * Guardamos el token recibido
-                 * por Spring Boot.
-                 */
+                /* =========================
+                   GUARDAR TOKEN
+                ========================= */
 
                 if (datos.token) {
 
@@ -142,24 +134,30 @@ document.addEventListener("DOMContentLoaded", () => {
                         "token",
                         datos.token
                     );
-
                 }
 
 
-                /*
-                 * Guardamos información del usuario
-                 * si el backend la devuelve.
-                 */
+                /* =========================
+                   GUARDAR ID DEL USUARIO
+                ========================= */
 
-                if (datos.usuario) {
+                if (datos.id) {
 
                     localStorage.setItem(
-                        "usuario",
-                        JSON.stringify(datos.usuario)
+                        "usuarioId",
+                        datos.id
                     );
 
+                    console.log(
+                        "ID del usuario guardado:",
+                        datos.id
+                    );
                 }
 
+
+                /* =========================
+                   MENSAJE DE ÉXITO
+                ========================= */
 
                 mostrarMensaje(
                     "Inicio de sesión exitoso.",
@@ -167,10 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-                /*
-                 * Esperamos un momento para
-                 * mostrar el mensaje.
-                 */
+                /* =========================
+                   REDIRECCIÓN
+                ========================= */
 
                 setTimeout(() => {
 
@@ -181,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             } else {
-
 
                 /* =========================
                    ERROR DEL SERVIDOR
@@ -194,17 +190,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     "error"
                 );
 
-
                 boton.disabled = false;
-
-                boton.textContent =
-                    "Iniciar sesión";
-
+                boton.textContent = "Iniciar sesión";
             }
 
 
         } catch (error) {
-
 
             /* =============================
                ERROR DE CONEXIÓN
@@ -215,22 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-
             mostrarMensaje(
                 "No fue posible conectar con el servidor.",
                 "error"
             );
 
-
             boton.disabled = false;
-
-            boton.textContent =
-                "Iniciar sesión";
-
+            boton.textContent = "Iniciar sesión";
         }
 
     });
-
 
 
     /* =====================================
@@ -241,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         loginMessage.textContent = mensaje;
 
-
         if (tipo === "success") {
 
             loginMessage.style.color = "#16a34a";
@@ -249,9 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
 
             loginMessage.style.color = "#dc2626";
-
         }
-
     }
 
 });

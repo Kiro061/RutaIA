@@ -4,7 +4,7 @@
    cerrarSesion) cargado antes que este archivo.
 ========================================= */
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://172.16.102.4:8080/rutaia/api/v1";
 
 /* --- Utilidades --- */
 
@@ -28,7 +28,7 @@ function mostrarEstado(contenedor, mensaje) {
 /* --- Peticiones --- */
 
 async function pedirConsultas() {
-    const respuesta = await fetch(`${API_URL}/api/consultas`, {
+    const respuesta = await fetch(`${API_URL}/consultas`, {
         headers: { "Authorization": `Bearer ${obtenerToken()}` }
     });
 
@@ -44,7 +44,7 @@ async function pedirConsultas() {
 }
 
 async function pedirCursos() {
-    const respuesta = await fetch(`${API_URL}/api/cursos`);
+    const respuesta = await fetch(`${API_URL}/cursos`);
     if (!respuesta.ok) throw new Error("No fue posible cargar el catálogo.");
 
     const datos = await respuesta.json();

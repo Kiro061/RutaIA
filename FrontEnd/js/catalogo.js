@@ -2,28 +2,61 @@
    RUTAIA - CATÁLOGO
 ========================================= */
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://172.16.102.4:8080/rutaia/api/v1";
 
 let cursosCache = [];
 
 async function cargarCatalogo() {
+
     const grid = document.getElementById("catalogoGrid");
-    grid.innerHTML = '<p class="catalogo-estado">Cargando catálogo…</p>';
+
+    grid.innerHTML = `
+        <p class="catalogo-estado">
+            Cargando catálogo…
+        </p>
+    `;
 
     try {
-        const respuesta = await fetch(`${API_URL}/api/cursos`);
-        const datos = await respuesta.json();
+        const token = localStorage.getItem("token");
+        console.log("Token encontrado:", token);
 
-        if (!respuesta.ok) {
-            throw new Error(datos.mensaje || datos.message || "No fue posible cargar el catálogo.");
+        if (!token) {
+            throw new Error("No hay token de autenticación.");
         }
 
+        const respuesta = await fetch(`${API_URL}/cursos`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        console.log("Status cursos:", respuesta.status);
+        const texto = await respuesta.text();
+        console.log("Respuesta cursos:", texto);
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `Error ${respuesta.status}: ${texto || "Sin respuesta"}`
+            );
+        }
+
+        if (!texto.trim()) {
+            throw new Error("El servidor respondió vacío.");
+        }
+
+        const datos = JSON.parse(texto);
+        console.log("Cursos recibidos:", datos);
         cursosCache = Array.isArray(datos) ? datos : [];
         renderCursos(cursosCache);
-
     } catch (error) {
         console.error("Error al cargar catálogo:", error);
-        grid.innerHTML = `<p class="catalogo-estado">${error.message}</p>`;
+        grid.innerHTML = `
+            <p class="catalogo-estado">
+                ${error.message}
+            </p>
+        `;
     }
 }
 
