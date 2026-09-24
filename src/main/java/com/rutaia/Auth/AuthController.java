@@ -37,7 +37,10 @@ public class AuthController {
 
         try{
             String token = jwtService.generateToken(request.usuario());
-            return Map.of("token", token);
+            return Map.of(
+                    "token", token,
+                    "id", String.valueOf(usuario.id())
+            );
         }catch (Exception e){
             System.out.println(e.getMessage());
         }

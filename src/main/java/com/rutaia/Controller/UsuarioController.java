@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usarios")
+@RequestMapping("/usuarios")
 @Validated
 @RequiredArgsConstructor
 public class UsuarioController {
@@ -51,7 +51,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.buscarPorNombreSimilarA(nombre));
     }
 
-    @GetMapping("/correo/{correo}")
+    @GetMapping("/correo/'{correo:.+}'")
     public ResponseEntity<UsuarioResponse> buscarCorreo(@PathVariable String correo){
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.buscarPorCorreo(correo));
     }
