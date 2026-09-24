@@ -1,7 +1,5 @@
 /* =========================================
    RUTAIA - CHATBOT DE CONSULTA
-   (mismo patrón que el ejemplo de clase:
-   tabs, burbujas, tarjetas sugeridas)
 ========================================= */
 
 const API_URL = "http://localhost:8080";
@@ -58,7 +56,7 @@ function agregarMensaje(tipo, texto) {
     return div;
 }
 
-function agregarRespuestaBot(consulta) {
+function crearRespuestaBot(consulta) {
     const div = document.createElement("div");
     div.className = "msg bot";
 
@@ -100,6 +98,11 @@ function agregarRespuestaBot(consulta) {
         div.appendChild(construirCalificacion(consulta));
     }
 
+    return div;
+}
+
+function agregarRespuestaBot(consulta) {
+    const div = crearRespuestaBot(consulta);
     mensajesEl.appendChild(div);
     mensajesEl.scrollTop = mensajesEl.scrollHeight;
     return div;
@@ -265,11 +268,7 @@ async function cargarHistorial() {
                 boton.addEventListener("click", () => {
                     body.hidden = !body.hidden;
                     if (!body.hidden && !renderizado) {
-                        const respuestaBot = document.createElement("div");
-                        respuestaBot.className = "msg bot";
-                        respuestaBot.style.maxWidth = "100%";
-                        body.appendChild(respuestaBot);
-                        body.replaceChild(agregarRespuestaBotEnNodo(consulta), respuestaBot);
+                        body.appendChild(crearRespuestaBot(consulta));
                         renderizado = true;
                     }
                 });
@@ -283,11 +282,4 @@ async function cargarHistorial() {
     }
 }
 
-/* Reutiliza agregarRespuestaBot pero sin insertarlo en #mensajes,
-   para poder colocarlo dentro de un ítem del historial. */
-function agregarRespuestaBotEnNodo(consulta) {
-    const antes = mensajesEl.lastElementChild;
-    const nodo = agregarRespuestaBot(consulta);
-    mensajesEl.removeChild(nodo);
-    return nodo;
-}
+document.addEventListener("DOMContentLoaded", cargarHistorial);

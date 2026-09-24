@@ -1,3 +1,16 @@
+/* Footer siempre al final: si el catálogo tiene pocos cursos (o está
+   cargando / falló la API), el contenido no alcanza la altura de la
+   pantalla y el footer quedaba flotando a mitad de página. */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body > main {
+    flex: 1;
+}
+
 .catalogo-toolbar {
     max-width: 1100px;
     margin: 0 auto 30px;

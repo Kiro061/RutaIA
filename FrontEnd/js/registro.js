@@ -1,17 +1,53 @@
+const API_URL = "http://localhost:8080/api/usuarios";
 
 const registroForm = document.getElementById("registroForm");
 
-const nombreCompleto = document.getElementById("nombreCompleto");
+const nombre = document.getElementById("nombre");
+const apellido = document.getElementById("apellido");
 const correo = document.getElementById("correo");
-const nivelExperiencia = document.getElementById("nivelExperiencia");
-const areaInteres = document.getElementById("areaInteres");
+const password = document.getElementById("password");
+const confirmarPassword = document.getElementById("confirmarPassword");
 
+const btnRegistrar = document.getElementById("btnRegistrar");
 const mensaje = document.getElementById("mensaje");
 
+const mostrarPassword = document.getElementById("mostrarPassword");
+const mostrarConfirmarPassword = document.getElementById("mostrarConfirmarPassword");
 
-// ========================================
-// MOSTRAR MENSAJE
-// ========================================
+
+// ===============================
+// MOSTRAR / OCULTAR CONTRASEÑA
+// ===============================
+
+mostrarPassword.addEventListener("click", () => {
+
+    if (password.type === "password") {
+        password.type = "text";
+        mostrarPassword.textContent = "Ocultar";
+    } else {
+        password.type = "password";
+        mostrarPassword.textContent = "Mostrar";
+    }
+
+});
+
+
+mostrarConfirmarPassword.addEventListener("click", () => {
+
+    if (confirmarPassword.type === "password") {
+        confirmarPassword.type = "text";
+        mostrarConfirmarPassword.textContent = "Ocultar";
+    } else {
+        confirmarPassword.type = "password";
+        mostrarConfirmarPassword.textContent = "Mostrar";
+    }
+
+});
+
+
+// ===============================
+// FUNCIONES DE MENSAJES
+// ===============================
 
 function mostrarMensaje(texto, tipo) {
 
@@ -27,25 +63,22 @@ function mostrarMensaje(texto, tipo) {
 }
 
 
-// ========================================
-// LIMPIAR ERRORES
-// ========================================
-
 function limpiarErrores() {
 
     document.getElementById("nombreError").textContent = "";
+    document.getElementById("apellidoError").textContent = "";
     document.getElementById("correoError").textContent = "";
-    document.getElementById("nivelError").textContent = "";
-    document.getElementById("areaError").textContent = "";
+    document.getElementById("passwordError").textContent = "";
+    document.getElementById("confirmarPasswordError").textContent = "";
 
     mensaje.textContent = "";
     mensaje.className = "mensaje";
 }
 
 
-// ========================================
-// VALIDAR FORMULARIO
-// ========================================
+// ===============================
+// VALIDACIÓN
+// ===============================
 
 function validarFormulario() {
 
@@ -53,104 +86,126 @@ function validarFormulario() {
 
     let valido = true;
 
-
-    // NOMBRE COMPLETO
-
-    if (nombreCompleto.value.trim() === "") {
-
+    if (nombre.value.trim() === "") {
         document.getElementById("nombreError").textContent =
-            "El nombre completo es obligatorio.";
+            "El nombre es obligatorio.";
 
         valido = false;
     }
 
+    if (apellido.value.trim() === "") {
+        document.getElementById("apellidoError").textContent =
+            "El apellido es obligatorio.";
 
-    // CORREO
+        valido = false;
+    }
 
     if (correo.value.trim() === "") {
 
         document.getElementById("correoError").textContent =
-            "El correo electrónico es obligatorio.";
+            "El correo es obligatorio.";
 
         valido = false;
 
-    } else {
+    } else if (!correo.value.includes("@")) {
 
-        const formatoCorreo =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!formatoCorreo.test(correo.value.trim())) {
-
-            document.getElementById("correoError").textContent =
-                "Ingresa un correo electrónico válido.";
-
-            valido = false;
-        }
-    }
-
-
-    // NIVEL DE EXPERIENCIA
-
-    const nivelesPermitidos = [
-        "PRINCIPIANTE",
-        "INTERMEDIO",
-        "AVANZADO"
-    ];
-
-    if (!nivelesPermitidos.includes(nivelExperiencia.value)) {
-
-        document.getElementById("nivelError").textContent =
-            "Selecciona un nivel de experiencia.";
+        document.getElementById("correoError").textContent =
+            "Ingresa un correo válido.";
 
         valido = false;
     }
 
+    if (password.value.length < 6) {
 
-    // ÁREA DE INTERÉS
-
-    if (areaInteres.value.trim() === "") {
-
-        document.getElementById("areaError").textContent =
-            "El área de interés es obligatoria.";
+        document.getElementById("passwordError").textContent =
+            "La contraseña debe tener mínimo 6 caracteres.";
 
         valido = false;
     }
 
+    if (password.value !== confirmarPassword.value) {
+
+        document.getElementById("confirmarPasswordError").textContent =
+            "Las contraseñas no coinciden.";
+
+        valido = false;
+    }
 
     return valido;
 }
 
 
-// ========================================
-// ENVÍO DEL FORMULARIO
-// ========================================
+// ===============================
+// REGISTRO
+// ===============================
 
-registroForm.addEventListener("submit", (event) => {
+registroForm.addEventListener("submit", async (event) => {
 
     event.preventDefault();
-
 
     if (!validarFormulario()) {
         return;
     }
 
+    btnRegistrar.disabled = true;
+    btnRegistrar.textContent = "Registrando...";
 
-    /*
-     * AQUÍ SE CONECTARÁ POSTERIORMENTE
-     * CON EL BACKEND DE SPRING BOOT.
-     *
-     * Los datos disponibles son:
-     *
-     * nombreCompleto.value
-     * correo.value
-     * nivelExperiencia.value
-     * areaInteres.value
-     */
+    const usuario = {
+        nombre: nombre.value.trim(),
+        apellido: apellido.value.trim(),
+        correo: correo.value.trim(),
+        password: password.value
+    };
 
+    try {
 
-    mostrarMensaje(
-        "Formulario válido. Listo para conectar con el servidor.",
-        "exito"
-    );
+        const respuesta = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(usuario)
+
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                datos.mensaje ||
+                datos.message ||
+                "No fue posible registrar el usuario."
+            );
+        }
+
+        mostrarMensaje(
+            "Cuenta creada correctamente. Redirigiendo al login...",
+            "exito"
+        );
+
+        registroForm.reset();
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 2000);
+
+    } catch (error) {
+
+        console.error("Error:", error);
+
+        mostrarMensaje(
+            error.message || "Error al conectar con el servidor.",
+            "error"
+        );
+
+    } finally {
+
+        btnRegistrar.disabled = false;
+        btnRegistrar.textContent = "Crear cuenta";
+    }
 
 });
