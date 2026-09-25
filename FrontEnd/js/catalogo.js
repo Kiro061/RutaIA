@@ -17,24 +17,15 @@ async function cargarCatalogo() {
     `;
 
     try {
-        const token = localStorage.getItem("token");
-        console.log("Token encontrado:", token);
-
-        if (!token) {
-            throw new Error("No hay token de autenticación.");
-        }
-
+        // El catálogo es público: no requiere sesión ni token.
         const respuesta = await fetch(`${API_URL}/cursos`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         });
 
-        console.log("Status cursos:", respuesta.status);
         const texto = await respuesta.text();
-        console.log("Respuesta cursos:", texto);
 
         if (!respuesta.ok) {
             throw new Error(
@@ -47,7 +38,6 @@ async function cargarCatalogo() {
         }
 
         const datos = JSON.parse(texto);
-        console.log("Cursos recibidos:", datos);
         cursosCache = Array.isArray(datos) ? datos : [];
         renderCursos(cursosCache);
     } catch (error) {
@@ -78,7 +68,7 @@ function renderCursos(cursos) {
             <p>${curso.descripcion || ""}</p>
             <div class="meta">
                 <span>${curso.nivel || ""}</span>
-                <span>${curso.duracionHoras ? curso.duracionHoras + " h" : ""}</span>
+                <span>${curso.duracion ? curso.duracion : ""}</span>
             </div>
         `;
         grid.appendChild(card);

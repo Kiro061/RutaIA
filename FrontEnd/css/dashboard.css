@@ -37,11 +37,18 @@ body {
 
 .dash-welcome p { color: var(--text-light); }
 
+.dash-perfil {
+    margin-top: 6px;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* --- Estadísticas --- */
 
 .dash-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     margin-bottom: 24px;
 }
@@ -78,7 +85,7 @@ body {
 
 .dash-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
     margin-bottom: 24px;
 }
@@ -167,28 +174,6 @@ a.lista-item:hover {
     margin-top: 2px;
 }
 
-.curso-rank {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.curso-rank .pos {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background-color: var(--light-blue);
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.curso-rank .info { min-width: 0; flex: 1; }
-
 /* --- Accesos rápidos --- */
 
 .dash-actions {
@@ -232,15 +217,10 @@ a.lista-item:hover {
 
 /* --- Responsive --- */
 
-@media (max-width: 900px) {
-    .dash-stats { grid-template-columns: repeat(2, 1fr); }
-    .dash-grid,
-    .dash-actions { grid-template-columns: 1fr; }
-}
-
 @media (max-width: 650px) {
     .dash-welcome { flex-direction: column; align-items: flex-start; }
     .dash-welcome h1 { font-size: 26px; }
     .dash-welcome .btn-primary { width: 100%; text-align: center; }
     .dashboard { padding: 28px 5% 50px; }
+    .dash-actions { grid-template-columns: 1fr; }
 }

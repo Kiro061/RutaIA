@@ -21,11 +21,10 @@
     </button>
 
     <nav id="navMenu">
-        <a href="../index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="dashboard.html" class="is-active" data-auth-only hidden>Dashboard</a>
-        <a href="consulta.html" data-auth-only hidden>Consulta</a>
-        <a href="login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
+        <a href="./dashboard.html">Inicio</a>
+        <a href="./catalogo.html">Catálogo</a>
+        <a href="./consulta.html" data-auth-only hidden>Consulta</a>
+        <a href="./login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
 
         <div class="nav-user" data-auth-only hidden>
             <span class="nav-user-name" id="navUserName"></span>
@@ -40,10 +39,11 @@
     <section class="dash-welcome">
         <div>
             <span class="section-tag">Panel de control</span>
-            <h1>Hola, <span id="dashNombre">estudiante</span> 👋</h1>
+            <h1>Hola, <span id="dashNombre">estudiante</span> </h1>
             <p>Este es el resumen de tu actividad en RutaIA.</p>
+            <p class="dash-perfil" id="dashPerfil"></p>
         </div>
-        <a href="consulta.html" class="btn-primary">Nueva consulta</a>
+        <a href="./consulta.html" class="btn-primary">Nueva consulta</a>
     </section>
 
     <!-- Estadísticas -->
@@ -53,16 +53,8 @@
             <strong class="stat-value" id="statConsultas">–</strong>
         </article>
         <article class="stat-card">
-            <span class="stat-label">Cursos recomendados</span>
-            <strong class="stat-value" id="statRecomendados">–</strong>
-        </article>
-        <article class="stat-card">
             <span class="stat-label">Cursos en el catálogo</span>
             <strong class="stat-value" id="statCatalogo">–</strong>
-        </article>
-        <article class="stat-card">
-            <span class="stat-label">Última consulta</span>
-            <strong class="stat-value stat-value--small" id="statUltima">–</strong>
         </article>
     </section>
 
@@ -72,20 +64,9 @@
         <section class="dash-panel">
             <div class="panel-header">
                 <h2>Últimas consultas</h2>
-                <a href="consulta.html">Ver historial →</a>
+                <a href="./consulta.html">Ver historial →</a>
             </div>
             <div id="listaConsultas" class="lista">
-                <p class="dash-estado">Cargando…</p>
-            </div>
-        </section>
-
-        <!-- Cursos más recomendados -->
-        <section class="dash-panel">
-            <div class="panel-header">
-                <h2>Cursos que más te recomendamos</h2>
-                <a href="catalogo.html">Ver catálogo →</a>
-            </div>
-            <div id="listaCursos" class="lista">
                 <p class="dash-estado">Cargando…</p>
             </div>
         </section>
@@ -94,14 +75,14 @@
 
     <!-- Accesos rápidos -->
     <section class="dash-actions">
-        <a href="consulta.html" class="action-card">
+        <a href="./consulta.html" class="action-card">
             <span class="card-icon">IA</span>
             <div>
                 <h3>Pregúntale al asesor</h3>
                 <p>Cuéntanos qué quieres aprender y te sugerimos cursos.</p>
             </div>
         </a>
-        <a href="catalogo.html" class="action-card">
+        <a href="./catalogo.html" class="action-card">
             <span class="card-icon">CT</span>
             <div>
                 <h3>Explorar el catálogo</h3>

@@ -5,6 +5,8 @@ const registroForm = document.getElementById("registroForm");
 const nombre = document.getElementById("nombre");
 const apellido = document.getElementById("apellido");
 const correo = document.getElementById("correo");
+const nivelExperiencia = document.getElementById("nivelExperiencia");
+const areaInteres = document.getElementById("areaInteres");
 const password = document.getElementById("password");
 const confirmarPassword = document.getElementById("confirmarPassword");
 
@@ -68,6 +70,8 @@ function limpiarErrores() {
     document.getElementById("nombreError").textContent = "";
     document.getElementById("apellidoError").textContent = "";
     document.getElementById("correoError").textContent = "";
+    document.getElementById("nivelExperienciaError").textContent = "";
+    document.getElementById("areaInteresError").textContent = "";
     document.getElementById("passwordError").textContent = "";
     document.getElementById("confirmarPasswordError").textContent = "";
 
@@ -115,10 +119,24 @@ function validarFormulario() {
         valido = false;
     }
 
-    if (password.value.length < 6) {
+    if (nivelExperiencia.value === "") {
+        document.getElementById("nivelExperienciaError").textContent =
+            "Selecciona tu nivel de experiencia.";
+
+        valido = false;
+    }
+
+    if (areaInteres.value.trim() === "") {
+        document.getElementById("areaInteresError").textContent =
+            "El área de interés es obligatoria.";
+
+        valido = false;
+    }
+
+    if (password.value.length < 8) {
 
         document.getElementById("passwordError").textContent =
-            "La contraseña debe tener mínimo 6 caracteres.";
+            "La contraseña debe tener mínimo 8 caracteres.";
 
         valido = false;
     }
@@ -132,6 +150,27 @@ function validarFormulario() {
     }
 
     return valido;
+}
+
+
+// ===============================
+// LECTURA SEGURA DE LA RESPUESTA
+// ===============================
+
+async function leerCuerpoSeguro(respuesta) {
+
+    const texto = await respuesta.text();
+
+    if (!texto.trim()) {
+        return null; // respuesta sin cuerpo (p. ej. un 403 de Spring Security)
+    }
+
+    try {
+        return JSON.parse(texto);
+    } catch (e) {
+        console.error("La respuesta no es JSON válido:", texto);
+        return null;
+    }
 }
 
 
@@ -150,16 +189,19 @@ registroForm.addEventListener("submit", async (event) => {
     btnRegistrar.disabled = true;
     btnRegistrar.textContent = "Registrando...";
 
+    // El backend maneja un solo campo "nombre" (nombre completo),
+    // así que combinamos nombre + apellido antes de enviarlo.
     const usuario = {
-        nombre: nombre.value.trim(),
-        apellido: apellido.value.trim(),
+        nombre: `${nombre.value.trim()} ${apellido.value.trim()}`.trim(),
         correo: correo.value.trim(),
-        password: password.value
+        password: password.value,
+        nivelExperiencia: nivelExperiencia.value,
+        areaInteres: areaInteres.value.trim()
     };
 
     try {
 
-        const respuesta = await fetch(API_URL, {
+        const respuesta = await fetch(`${API_URL}/usuarios`, {
 
             method: "POST",
 
@@ -171,15 +213,25 @@ registroForm.addEventListener("submit", async (event) => {
 
         });
 
-        const datos = await respuesta.json();
+        const datos = await leerCuerpoSeguro(respuesta);
 
         if (!respuesta.ok) {
 
-            throw new Error(
-                datos.mensaje ||
-                datos.message ||
-                "No fue posible registrar el usuario."
-            );
+            // Errores de validación (400) llegan como { errors: { campo: mensaje } }
+            if (datos && datos.errors) {
+                const primerError = Object.values(datos.errors)[0];
+                throw new Error(primerError || "Revisa los datos del formulario.");
+            }
+
+            if (datos && (datos.mensaje || datos.message)) {
+                throw new Error(datos.mensaje || datos.message);
+            }
+
+            if (respuesta.status === 403) {
+                throw new Error("El servidor rechazó la solicitud (403). Verifica la configuración de seguridad del backend.");
+            }
+
+            throw new Error(`No fue posible registrar el usuario (código ${respuesta.status}).`);
         }
 
         mostrarMensaje(

@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 /* =========================
-                   GUARDAR ID DEL USUARIO
+                   GUARDAR ID Y DATOS DEL USUARIO
                 ========================= */
 
                 if (datos.id) {
@@ -147,6 +147,39 @@ document.addEventListener("DOMContentLoaded", () => {
                         "usuarioId",
                         datos.id
                     );
+
+                    // Traemos el resto de los datos del usuario (nombre, correo,
+                    // nivel de experiencia, área de interés) para que el
+                    // dashboard y la navbar puedan mostrarlos. auth.js y
+                    // dashboard.js leen la clave "usuario" de localStorage.
+                    try {
+
+                        const respUsuario = await fetch(
+                            `${API_URL}/usuarios/${datos.id}`,
+                            {
+                                headers: {
+                                    "Authorization": `Bearer ${datos.token}`
+                                }
+                            }
+                        );
+
+                        if (respUsuario.ok) {
+
+                            const usuario = await respUsuario.json();
+
+                            localStorage.setItem(
+                                "usuario",
+                                JSON.stringify(usuario)
+                            );
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            "No fue posible cargar los datos del usuario:",
+                            error
+                        );
+                    }
 
                     console.log(
                         "ID del usuario guardado:",
@@ -172,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 setTimeout(() => {
 
                     window.location.href =
-                        "consulta.html";
+                        "dashboard.html";
 
                 }, 800);
 

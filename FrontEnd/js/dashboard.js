@@ -28,7 +28,7 @@ function mostrarEstado(contenedor, mensaje) {
 /* --- Peticiones --- */
 
 async function pedirConsultas() {
-    const respuesta = await fetch(`${API_URL}/consultas`, {
+    const respuesta = await fetch(`${API_URL}/api/consultas`, {
         headers: { "Authorization": `Bearer ${obtenerToken()}` }
     });
 
@@ -66,68 +66,22 @@ function renderUltimasConsultas(consultas) {
         const item = crear("a", "lista-item");
         item.href = "consulta.html";
 
-        item.appendChild(crear("span", "fecha", formatearFecha(consulta.fecha)));
-        item.appendChild(crear("span", "texto", consulta.textoConsulta || "Consulta sin texto"));
-
-        const total = (consulta.recomendaciones || []).length;
-        item.appendChild(crear("span", "detalle",
-            total === 1 ? "1 curso recomendado" : `${total} cursos recomendados`));
+        item.appendChild(crear("span", "fecha", formatearFecha(consulta.fechaConsulta)));
+        item.appendChild(crear("span", "texto", consulta.texto || "Consulta sin texto"));
+        item.appendChild(crear("span", "detalle", consulta.estado || ""));
 
         cont.appendChild(item);
     });
 }
 
-function renderCursosTop(consultas) {
-    const cont = document.getElementById("listaCursos");
-
-    // Cuenta cuántas veces se recomendó cada curso
-    const conteo = new Map();
-    consultas.forEach((consulta) => {
-        (consulta.recomendaciones || []).forEach((rec) => {
-            const nombre = rec.nombreCurso;
-            if (nombre) conteo.set(nombre, (conteo.get(nombre) || 0) + 1);
-        });
-    });
-
-    if (!conteo.size) {
-        mostrarEstado(cont, "Cuando hagas consultas, aquí verás tus cursos recomendados.");
-        return conteo;
-    }
-
-    cont.replaceChildren();
-    [...conteo.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .forEach(([nombre, veces], indice) => {
-            const item = crear("div", "lista-item curso-rank");
-            item.appendChild(crear("span", "pos", String(indice + 1)));
-
-            const info = crear("div", "info");
-            info.appendChild(crear("span", "texto", nombre));
-            info.appendChild(crear("span", "detalle",
-                veces === 1 ? "Recomendado 1 vez" : `Recomendado ${veces} veces`));
-            item.appendChild(info);
-
-            cont.appendChild(item);
-        });
-
-    return conteo;
-}
-
-function renderEstadisticas(consultas, cursos, conteo) {
+function renderEstadisticas(consultas, cursos) {
     if (consultas) {
-        const ordenadas = consultas
-            .slice()
-            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
         document.getElementById("statConsultas").textContent = consultas.length;
-        document.getElementById("statRecomendados").textContent = conteo ? conteo.size : 0;
-        document.getElementById("statUltima").textContent =
-            ordenadas.length ? (formatearFecha(ordenadas[0].fecha) || "–") : "Sin consultas";
     }
 
     if (cursos) {
-        document.getElementById("statCatalogo").textContent = cursos.length;
+        document.getElementById("statCatalogo").textContent =
+            cursos.filter((curso) => curso.activo !== false).length;
     }
 }
 
@@ -139,6 +93,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (usuario) {
         document.getElementById("dashNombre").textContent =
             usuario.nombre || usuario.correo || "estudiante";
+
+        const perfilEl = document.getElementById("dashPerfil");
+        if (perfilEl && (usuario.nivelExperiencia || usuario.areaInteres)) {
+            const partes = [];
+            if (usuario.nivelExperiencia) partes.push(`Nivel: ${usuario.nivelExperiencia}`);
+            if (usuario.areaInteres) partes.push(`Interés: ${usuario.areaInteres}`);
+            perfilEl.textContent = partes.join(" · ");
+        }
     }
 
     // Las dos peticiones van en paralelo; si una falla, la otra igual se muestra
@@ -148,21 +110,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     ]);
 
     let consultas = null;
-    let conteo = null;
 
     if (resConsultas.status === "fulfilled") {
         if (resConsultas.value === null) return; // sesión cerrada por 401
 
         consultas = resConsultas.value
             .slice()
-            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            .sort((a, b) => new Date(b.fechaConsulta) - new Date(a.fechaConsulta));
 
         renderUltimasConsultas(consultas);
-        conteo = renderCursosTop(consultas);
     } else {
         console.error(resConsultas.reason);
         mostrarEstado(document.getElementById("listaConsultas"), "No fue posible cargar tus consultas.");
-        mostrarEstado(document.getElementById("listaCursos"), "No fue posible cargar tus recomendaciones.");
     }
 
     let cursos = null;
@@ -172,5 +131,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(resCursos.reason);
     }
 
-    renderEstadisticas(consultas, cursos, conteo);
+    renderEstadisticas(consultas, cursos);
 });
