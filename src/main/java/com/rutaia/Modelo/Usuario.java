@@ -1,5 +1,6 @@
 package com.rutaia.Modelo;
 
+import com.rutaia.Modelo.Enums.NivelExperiencia;
 import com.rutaia.Modelo.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,4 +28,11 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nivel_experiencia", length = 20)
+    private NivelExperiencia nivelExperiencia;
+
+    @Column(name = "area_interes", length = 100)
+    private String areaInteres;
 }

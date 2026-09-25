@@ -10,14 +10,13 @@ public record CursoRequest(
         @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
         String nombre,
 
-        @NotBlank(message = "el nombre no puede ser vacio")
-        @NotNull(message = "el nombre no puede ser nulo")
-        @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
+        @NotBlank(message = "la categoria no puede ser vacia")
+        @NotNull(message = "la categoria no puede ser nula")
         String categoria,
 
-        @NotBlank(message = "el nombre no puede ser vacio")
-        @NotNull(message = "el nombre no puede ser nulo")
-        @Size(min = 8, max = 150, message = "El nombre debe tener entre 8 y 150 caracteres")
+        @NotBlank(message = "la descripcion no puede ser vacia")
+        @NotNull(message = "la descripcion no puede ser nula")
+        @Size(min = 8, max = 2000, message = "La descripcion debe tener entre 8 y 2000 caracteres")
         String descripcion,
 
         @NotBlank(message = "el nivel no puede ser vacio")

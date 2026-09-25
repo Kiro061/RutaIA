@@ -46,6 +46,10 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/api/persona/public/**").permitAll()
+                        // Catálogo público: el estudiante debe poder verlo sin iniciar sesión.
+                        .requestMatchers(HttpMethod.GET, "/cursos", "/cursos/**").permitAll()
+                        // Registro público: un estudiante nuevo todavía no tiene token.
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -58,7 +62,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

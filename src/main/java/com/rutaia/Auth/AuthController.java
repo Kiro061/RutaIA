@@ -1,9 +1,9 @@
 package com.rutaia.Auth;
 
 import com.rutaia.Config.JwtService;
-import com.rutaia.DTO.Response.UsuarioResponse;
 import com.rutaia.Exception.BuisnessRuleException;
-import com.rutaia.Service.UsuarioService;
+import com.rutaia.Modelo.Usuario;
+import com.rutaia.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,29 +19,28 @@ import java.util.Map;
 public class AuthController {
 
     private final JwtService jwtService;
-    private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody LoginRequest request) {
-        UsuarioResponse usuario;
+        Usuario usuario = usuarioRepository.findByCorreo(request.usuario());
+
+        if (usuario == null) {
+            throw new BuisnessRuleException("Credenciales inválidas");
+        }
+
+        if (!passwordEncoder.matches(request.contrasenia(), usuario.getPassword())) {
+            throw new BuisnessRuleException("Credenciales inválidas");
+        }
+
         try {
-            usuario = usuarioService.buscarPorCorreo(request.usuario());
-        } catch (Exception e) {
-            throw new BuisnessRuleException("Credenciales inválidas");
-        }
-        if(!passwordEncoder.matches(request.contrasenia(), usuario.password())){
-            throw new BuisnessRuleException("Credenciales inválidas");
-        }
-
-
-        try{
             String token = jwtService.generateToken(request.usuario());
             return Map.of(
                     "token", token,
-                    "id", String.valueOf(usuario.id())
+                    "id", String.valueOf(usuario.getId())
             );
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 

@@ -14,13 +14,20 @@ public record UsuarioRequest(
 
         @NotNull(message = "El correo no puede ser nulo")
         @NotBlank(message = "El correo no puede estar vacio")
-        @Size(min = 3, max = 150, message = "El correo debe tener entre 3 y 100 caracteres")
+        @Size(min = 3, max = 150, message = "El correo debe tener entre 3 y 150 caracteres")
         String correo,
 
-        @NotNull(message = "El correo no puede ser nulo")
-        @NotBlank(message = "El correo no puede estar vacio")
-        @Size(min = 8, max = 255, message = "La debe tener entre 3 y 255 caracteres")
+        @NotNull(message = "La contraseña no puede ser nula")
+        @NotBlank(message = "La contraseña no puede estar vacia")
+        @Size(min = 8, max = 255, message = "La contraseña debe tener entre 8 y 255 caracteres")
         String password,
+
+        @NotBlank(message = "El nivel de experiencia no puede estar vacio")
+        String nivelExperiencia,
+
+        @NotBlank(message = "El area de interes no puede estar vacia")
+        @Size(max = 100, message = "El area de interes no puede superar 100 caracteres")
+        String areaInteres,
 
         Rol rol
 ) {

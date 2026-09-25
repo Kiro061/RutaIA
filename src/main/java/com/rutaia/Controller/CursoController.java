@@ -70,4 +70,9 @@ public class CursoController {
     public ResponseEntity<List<CursoResponse>> buscarCursoActivo(@PathVariable Boolean activo){
         return ResponseEntity.status(HttpStatus.OK).body(cursoService.buscarCursoActivo(activo));
     }
+
+    @PatchMapping("/{id}/desactivar")
+    public ResponseEntity<CursoResponse> desactivarCurso(@PathVariable Long id){
+        return ResponseEntity.ok(cursoService.desactivarCurso(id));
+    }
 }

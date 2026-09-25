@@ -106,7 +106,8 @@ public class ConsultaServiceImpl implements ConsultaService {
     @Override
     public List<ConsultaResponse> listarPorUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new BuisnessRuleException("El usuario no existe"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                        "El estudiante con id " + usuarioId + " no existe"));
         return consultaRepository.findByUsuario(usuario).stream()
                 .map(e -> consultaMapper.entityToDto(e, usuarioMapper.entityToDto(e.getUsuario()), obtenerCalificacion(e)))
                 .toList();

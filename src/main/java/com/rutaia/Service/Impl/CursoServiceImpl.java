@@ -11,6 +11,7 @@ import com.rutaia.Repository.CursoRepository;
 import com.rutaia.Service.CursoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 
@@ -92,5 +93,13 @@ public class CursoServiceImpl implements CursoService {
         return cursoReporitory.findByActivo(activo).stream().map(
                 cursoMapper::entityToDto
         ).toList();
+    }
+
+    @Override
+    public CursoResponse desactivarCurso(Long id) {
+        Curso curso = cursoReporitory.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("El curso con id " + id + " no existe"));
+        curso.setActivo(false);
+        return cursoMapper.entityToDto(cursoReporitory.save(curso));
     }
 }

@@ -30,14 +30,16 @@ public class CursoMapper {
         curso.setNombre(dto.nombre());
         curso.setDescripcion(dto.descripcion());
         curso.setDuracion(dto.duracion());
+        curso.setActivo(dto.activo() == null || dto.activo());
+
         try {
-            curso.setCategoria(Categoria.valueOf(dto.categoria().toUpperCase()));
+            curso.setCategoria(Categoria.valueOf(dto.categoria().trim().toUpperCase()));
         }catch (Exception e){
             throw new BuisnessRuleException("La categoria brindada para el curso es invalida");
         }
 
         try {
-            curso.setNivel(Nivel.valueOf(dto.nivel().toUpperCase()));
+            curso.setNivel(Nivel.valueOf(dto.nivel().trim().toUpperCase()));
         }catch (Exception e){
             throw new BuisnessRuleException("El nivel brindado es invalido");
         }
@@ -51,15 +53,16 @@ public class CursoMapper {
         curso.setNombre(dto.nombre());
         curso.setDescripcion(dto.descripcion());
         curso.setDuracion(dto.duracion());
+        curso.setActivo(dto.activo() == null ? curso.isActivo() : dto.activo());
 
         try {
-            curso.setCategoria(Categoria.valueOf(dto.categoria().toUpperCase()));
+            curso.setCategoria(Categoria.valueOf(dto.categoria().trim().toUpperCase()));
         }catch (Exception e){
             throw new BuisnessRuleException("La categoria brindada para el curso es invalida");
         }
 
         try {
-            curso.setNivel(Nivel.valueOf(dto.nivel().toUpperCase()));
+            curso.setNivel(Nivel.valueOf(dto.nivel().trim().toUpperCase()));
         }catch (Exception e){
             throw new BuisnessRuleException("El nivel brindado es invalido");
         }
