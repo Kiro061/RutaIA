@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - RutaIA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/catalogo.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar">
+    <div class="logo"><a href="../index.html">RutaIA</a></div>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav id="navMenu">
+        <a href="./dashboard.html">Inicio</a>
+        <a href="./catalogo.html" class="is-active">Catálogo</a>
+        <a href="./consulta.html" data-auth-only hidden>Consulta</a>
+        <a href="./login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
+
+        <div class="nav-user" data-auth-only hidden>
+            <span class="nav-user-name" id="navUserName"></span>
+            <button class="btn-nav btn-nav--ghost" id="navLogoutBtn">Cerrar sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main class="section">
+    <div class="section-header">
+        <span class="section-tag">RutaIA</span>
+        <h2>Catálogo de cursos</h2>
+        <p>Explora los cursos disponibles en la institución.</p>
+    </div>
+
+    <div class="catalogo-toolbar">
+        <input type="search" id="buscador" placeholder="Buscar por nombre o categoría…">
+    </div>
+
+    <div class="catalogo-grid" id="catalogoGrid">
+        <p class="catalogo-estado">Cargando catálogo…</p>
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 RutaIA — Plataforma de recomendación académica</p>
+</footer>
+
+<script src="../js/auth.js"></script>
+<script src="../js/navbar.js"></script>
+<script src="../js/catalogo.js"></script>
+</body>
+</html>

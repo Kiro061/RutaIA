@@ -1,0 +1,282 @@
+CREATE DATABASE IF NOT EXISTS rutaia;
+
+USE rutaia;
+
+
+CREATE TABLE usuario (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre     VARCHAR(100) NOT NULL,
+    correo     VARCHAR(150) NOT NULL UNIQUE,  
+    password VARCHAR(255) NOT NULL,         
+    rol        ENUM('ESTUDIANTE', 'ADMIN') NOT NULL DEFAULT 'ESTUDIANTE'
+);
+
+
+
+CREATE TABLE curso (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre      VARCHAR(150) NOT NULL UNIQUE,
+    categoria   ENUM('PROGRAMACION', 'DESARROLLO_WEB', 'BASES_DE_DATOS',
+                     'INTELIGENCIA_ARTIFICIAL', 'AUTOMATIZACION',
+                     'ANALISIS_DE_DATOS', 'HERRAMIENTAS') NOT NULL,
+    descripcion TEXT         NOT NULL,
+    nivel       ENUM('BASICO', 'INTERMEDIO', 'AVANZADO') NOT NULL,
+    activo      BOOLEAN      NOT NULL DEFAULT TRUE,
+    duracion    Varchar(150) NOT NULL,
+    INDEX idx_curso_activo_nivel (activo, nivel)
+);
+
+
+
+CREATE TABLE consulta (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id     BIGINT   NOT NULL,
+    texto          TEXT     NOT NULL,
+    fecha_consulta DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuario (id) ON DELETE CASCADE,
+    -- Índice: historial de un usuario ordenado por fecha
+    INDEX idx_consulta_usuario_fecha (usuario_id, fecha_consulta)
+);
+
+
+CREATE TABLE recomendacion (
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    consulta_id       BIGINT        NOT NULL,
+    curso_id          BIGINT        NOT NULL,
+    puntaje_similitud DECIMAL(5,4),
+    justificacion     TEXT          NOT NULL,
+    FOREIGN KEY (consulta_id) REFERENCES consulta (id) ON DELETE CASCADE,
+    FOREIGN KEY (curso_id)    REFERENCES curso (id),
+    UNIQUE (consulta_id, curso_id)
+);
+
+
+CREATE TABLE calificacion (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    consulta_id BIGINT      NOT NULL UNIQUE,
+    puntuacion  INT         NOT NULL,
+    comentario  VARCHAR(500) NULL,
+    CONSTRAINT fk_calificacion_consulta
+        FOREIGN KEY (consulta_id) REFERENCES consulta(id)
+);
+
+
+-- ========================================================================================
+insert into usuario values
+(1, 'RolAdminPrueba', "ejemplo@gmail.com", '$2a$10$i3ClSWfFmaxabX3dsfZLveH3qi/M6Ptf5jdxyvTIk84jSPl8TG7dm', 'ADMIN');
+
+
+
+INSERT INTO usuario (nombre, correo, password, rol) VALUES
+('Carlos Rodríguez', 'carlos.rodriguez@email.com', '$2a$12$HIJzQxS8vTEcbFZ4l84zjOB5hgi1m3/hFO0covA.NB9HWNyYyzTd6', 'ESTUDIANTE'), # 123456
+('María González', 'maria.gonzalez@email.com', '$2a$12$Q2gXjiHE8M1z7aANgZnhi.N1BNRoEAkIhJGHeYYlkxKQYNozBl1.q', 'ESTUDIANTE'), # 123456
+('Juan Pérez', 'juan.perez@email.com', '$2a$12$glVqyCIE6sD7y7eTYC8Ip.4UYa4ftbSicy4sNlw.WbOwXLIcnoT5C', 'ESTUDIANTE'), # 123456
+('Laura Martínez', 'laura.martinez@email.com', '$2a$12$OvXPXfeoVDX5qDVdyYuk5.YvTsPnFznMDjintz.IS62bXim4SX.oK', 'ESTUDIANTE'), # Estudiante123
+('Andrés Gómez', 'andres.gomez@email.com', '$2a$12$NlARhdIxJSE17OLwzngGHe5QXpmhPpGtByLudFkms84CHX6.o.wDS', 'ESTUDIANTE'),  # Estudiante123
+('Sofía Torres', 'sofia.torres@email.com', '$2a$12$5nhl9qAmxOkEUXUa.kurHepa.vBrqNYTknIGuZhxyOwNS00ltTmaq', 'ESTUDIANTE'),  # Estudiante123
+('Daniel Herrera', 'daniel.herrera@email.com', '$2a$12$LwtPT2OiTpeMgH26sHCkrOfWBSoyoL2z0B7Z/lMRd9ocUzStLdOKG', 'ESTUDIANTE'), #123Estudiante 
+('Valentina Castro', 'valentina.castro@email.com', '$2a$12$RlouNU9tZjlbk0HgrHqRr.HlmgCiwdA9ooF45Sy0RoSmnrVc1Ug0i', 'ESTUDIANTE'), #123Estudiante 
+('Administrador Principal', 'admin@plataforma.com', '$2a$12$TnB91OwKi7WsEihkvt.7f.V08BjrSnzwKUEX0R3Ed6zUC24YXDC.m', 'ESTUDIANTE'), #123Estudiante 
+('Administrador Soporte', 'soporte@plataforma.com', '$2a$12$Y3VyLrwQQweFx9Je.uNeduC1SdGmOwTBXRhjXPOTzt7rC46T7CoUe', 'ESTUDIANTE'); #123Estudiante 
+
+
+INSERT INTO curso(nombre, categoria, descripcion, nivel, activo, duracion) 
+values
+('Programacion', 'PROGRAMACION', 'Programacion de todo tipo', 'BASICO', true, '2 semanas');
+
+INSERT INTO curso
+(nombre, categoria, descripcion, nivel, activo, duracion)
+VALUES
+(
+    'Fundamentos de Java',
+    'PROGRAMACION',
+    'Curso introductorio para aprender los fundamentos del lenguaje Java, variables, estructuras de control, métodos, clases y programación orientada a objetos.',
+    'BASICO',
+    TRUE,
+    '40 horas'
+),
+(
+    'Programación Orientada a Objetos con Java',
+    'PROGRAMACION',
+    'Aprende los principales conceptos de programación orientada a objetos utilizando Java, incluyendo herencia, polimorfismo, encapsulamiento e interfaces.',
+    'INTERMEDIO',
+    TRUE,
+    '55 horas'
+),
+(
+    'Desarrollo de APIs REST con Spring Boot',
+    'PROGRAMACION',
+    'Construcción de APIs REST utilizando Spring Boot, Spring Data JPA, validaciones, manejo de excepciones y arquitectura por capas.',
+    'AVANZADO',
+    TRUE,
+    '70 horas'
+),
+(
+    'HTML y CSS desde Cero',
+    'DESARROLLO_WEB',
+    'Introducción al desarrollo web mediante HTML y CSS, creación de páginas, formularios, estilos y diseño responsive.',
+    'BASICO',
+    TRUE,
+    '30 horas'
+),
+(
+    'JavaScript Moderno',
+    'DESARROLLO_WEB',
+    'Curso de JavaScript moderno enfocado en funciones, objetos, arrays, DOM, eventos, asincronía y consumo de APIs.',
+    'INTERMEDIO',
+    TRUE,
+    '50 horas'
+),
+(
+    'Desarrollo Web Full Stack',
+    'DESARROLLO_WEB',
+    'Curso avanzado sobre desarrollo de aplicaciones web completas utilizando frontend, backend, APIs REST y bases de datos.',
+    'AVANZADO',
+    TRUE,
+    '90 horas'
+),
+(
+    'MySQL para Principiantes',
+    'BASES_DE_DATOS',
+    'Aprende los fundamentos de bases de datos relacionales, creación de tablas, consultas SQL, relaciones y operaciones CRUD.',
+    'BASICO',
+    TRUE,
+    '35 horas'
+),
+(
+    'Bases de Datos Relacionales',
+    'BASES_DE_DATOS',
+    'Diseño y administración de bases de datos relacionales, normalización, relaciones, claves y consultas SQL avanzadas.',
+    'INTERMEDIO',
+    TRUE,
+    '60 horas'
+),
+(
+    'Optimización de Bases de Datos',
+    'BASES_DE_DATOS',
+    'Técnicas avanzadas para optimizar consultas SQL, índices, procedimientos y rendimiento de bases de datos.',
+    'AVANZADO',
+    TRUE,
+    '65 horas'
+),
+(
+    'Introducción a la Inteligencia Artificial',
+    'INTELIGENCIA_ARTIFICIAL',
+    'Conceptos fundamentales de inteligencia artificial, aprendizaje automático, modelos predictivos y aplicaciones prácticas.',
+    'BASICO',
+    TRUE,
+    '40 horas'
+),
+(
+    'Machine Learning con Python',
+    'INTELIGENCIA_ARTIFICIAL',
+    'Introducción al aprendizaje automático utilizando Python, preparación de datos, entrenamiento de modelos y evaluación.',
+    'INTERMEDIO',
+    TRUE,
+    '65 horas'
+),
+(
+    'Deep Learning',
+    'INTELIGENCIA_ARTIFICIAL',
+    'Estudio de redes neuronales profundas, entrenamiento de modelos y aplicaciones de deep learning.',
+    'AVANZADO',
+    TRUE,
+    '80 horas'
+),
+(
+    'Automatización con n8n',
+    'AUTOMATIZACION',
+    'Aprende a crear flujos de automatización utilizando n8n, APIs, webhooks y diferentes servicios externos.',
+    'BASICO',
+    TRUE,
+    '25 horas'
+),
+(
+    'Automatización de Procesos',
+    'AUTOMATIZACION',
+    'Diseño de procesos automatizados integrando diferentes sistemas, APIs y herramientas empresariales.',
+    'INTERMEDIO',
+    TRUE,
+    '45 horas'
+),
+(
+    'Automatización Avanzada con APIs',
+    'AUTOMATIZACION',
+    'Creación de automatizaciones complejas mediante APIs REST, autenticación, webhooks y procesamiento de información.',
+    'AVANZADO',
+    TRUE,
+    '60 horas'
+),
+(
+    'Introducción al Análisis de Datos',
+    'ANALISIS_DE_DATOS',
+    'Fundamentos del análisis de datos, limpieza, organización y representación de información.',
+    'BASICO',
+    TRUE,
+    '30 horas'
+),
+(
+    'Análisis de Datos con Python',
+    'ANALISIS_DE_DATOS',
+    'Análisis y procesamiento de datos utilizando Python, Pandas, NumPy y herramientas de visualización.',
+    'INTERMEDIO',
+    TRUE,
+    '55 horas'
+),
+(
+    'Análisis Predictivo',
+    'ANALISIS_DE_DATOS',
+    'Aplicación de técnicas estadísticas y modelos predictivos para obtener información útil a partir de datos.',
+    'AVANZADO',
+    TRUE,
+    '70 horas'
+),
+(
+    'Git y GitHub',
+    'HERRAMIENTAS',
+    'Aprende control de versiones con Git, repositorios, ramas, commits, merges y trabajo colaborativo con GitHub.',
+    'BASICO',
+    TRUE,
+    '20 horas'
+),
+(
+    'Docker para Desarrolladores',
+    'HERRAMIENTAS',
+    'Introducción a Docker, imágenes, contenedores, volúmenes, redes y despliegue de aplicaciones.',
+    'INTERMEDIO',
+    TRUE,
+    '40 horas'
+),
+(
+    'DevOps y CI/CD',
+    'HERRAMIENTAS',
+    'Conceptos y herramientas para automatizar integración, pruebas y despliegue continuo de aplicaciones.',
+    'AVANZADO',
+    FALSE,
+    '75 horas'
+);
+
+
+-- ====================================================================================================
+
+-- 1) Consulta ahora persiste la respuesta de la IA y el estado (antes se perdían)
+ALTER TABLE consulta
+    ADD COLUMN respuesta TEXT NULL,
+    ADD COLUMN estado    VARCHAR(30) NULL;
+
+
+ALTER TABLE usuario
+    ADD COLUMN nivel_experiencia VARCHAR(20) NULL,
+    ADD COLUMN area_interes VARCHAR(100) NULL;
+
+-- =====================================================================================================
+
+INSERT INTO usuario (nombre, correo, password, rol, nivel_experiencia, area_interes) VALUES
+('Cristian Diaz', 'cris@email.com', '$2a$12$HIJzQxS8vTEcbFZ4l84zjOB5hgi1m3/hFO0covA.NB9HWNyYyzTd6', 'ESTUDIANTE',"Principiante","backend"); # 123456
+
+
+
+
+
+
+
