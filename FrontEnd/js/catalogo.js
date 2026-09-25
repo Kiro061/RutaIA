@@ -2,7 +2,7 @@
    RUTAIA - CATÁLOGO
 ========================================= */
 
-const API_URL = "http://172.16.102.4:8080/rutaia/api/v1";
+const API_URL = "http://localhost:8080/rutaia/api/v1";
 
 let cursosCache = [];
 

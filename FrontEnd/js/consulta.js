@@ -2,7 +2,7 @@
    RUTAIA - CHATBOT DE CONSULTA
 ========================================= */
 
-const API_URL = "http://172.16.102.4:8080/rutaia/api/v1";
+const API_URL = "http://localhost:8080/rutaia/api/v1";
 
 /* --- Tabs --- */
 
@@ -102,6 +102,28 @@ function agregarMensaje(tipo, texto) {
    CREAR RESPUESTA DEL BOT
 ========================================= */
 
+function escaparHtml(texto) {
+
+    const div = document.createElement("div");
+
+    div.textContent = texto;
+
+    return div.innerHTML;
+}
+
+
+// Convierte el texto plano de la IA (con **negritas** y saltos de línea)
+// en HTML seguro, escapando primero cualquier etiqueta que venga en el texto.
+function formatearRespuestaIA(texto) {
+
+    const escapado = escaparHtml(texto || "");
+
+    return escapado
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+}
+
+
 function crearRespuestaBot(consulta) {
 
     const div = document.createElement("div");
@@ -113,96 +135,23 @@ function crearRespuestaBot(consulta) {
 
     burbuja.className = "burbuja";
 
-    burbuja.textContent =
-        "Esto es lo que encontré para ti:";
+    const texto = consulta.respuesta;
 
-    div.appendChild(burbuja);
-
-
-    /* =====================================
-       RECOMENDACIONES
-    ===================================== */
-
-    const recomendaciones =
-        consulta.recomendaciones || [];
-
-    if (recomendaciones.length) {
-
-        const cont =
-            document.createElement("div");
-
-        cont.className = "sugeridos";
-
-
-        recomendaciones.forEach((rec) => {
-
-            const item =
-                document.createElement("div");
-
-            item.className = "sugerido";
-
-            item.innerHTML = `
-                <strong>
-                    ${rec.nombreCurso || "Curso recomendado"}
-                </strong>
-                <br>
-                ${rec.justificacion || ""}
-            `;
-
-            cont.appendChild(item);
-        });
-
-
-        div.appendChild(cont);
-
+    if (texto) {
+        burbuja.innerHTML = formatearRespuestaIA(texto);
     } else {
-
         burbuja.textContent =
             "No encontré una recomendación para esta consulta.";
     }
 
-
-    /* =====================================
-       FUENTES
-    ===================================== */
-
-    const fuentes =
-        consulta.fuentes || [];
-
-    if (fuentes.length) {
-
-        const fcont =
-            document.createElement("div");
-
-        fcont.className = "fuentes";
-
-        fcont.innerHTML =
-            '<span class="fuentes-titulo">Fuentes</span>';
-
-
-        fuentes.forEach((f) => {
-
-            const item =
-                document.createElement("div");
-
-            item.className = "fuente";
-
-            item.textContent =
-                f.descripcion || "";
-
-            fcont.appendChild(item);
-        });
-
-
-        div.appendChild(fcont);
-    }
+    div.appendChild(burbuja);
 
 
     /* =====================================
        CALIFICACIÓN
     ===================================== */
 
-    if (recomendaciones.length) {
+    if (texto) {
 
         div.appendChild(
             construirCalificacion(consulta)
@@ -256,7 +205,7 @@ function construirCalificacion(consulta) {
             </span>
 
             <p class="calificacion-enviada">
-                ${consulta.calificacion.valor} de 5
+                ${consulta.calificacion.puntuacion} de 5
             </p>
         `;
 
@@ -357,7 +306,7 @@ function construirCalificacion(consulta) {
 
                 const respuesta =
                     await fetch(
-                        `${API_URL}/api/consultas/${consulta.id}/calificacion`,
+                        `${API_URL}/api/calificaciones`,
                         {
                             method: "POST",
 
@@ -370,7 +319,8 @@ function construirCalificacion(consulta) {
                             },
 
                             body: JSON.stringify({
-                                valor: seleccion,
+                                consultaId: consulta.id,
+                                puntuacion: seleccion,
                                 comentario: comentario
                             })
                         }
@@ -388,9 +338,20 @@ function construirCalificacion(consulta) {
 
                 if (!respuesta.ok) {
 
-                    throw new Error(
-                        "No fue posible enviar la calificación."
-                    );
+                    let mensaje =
+                        "No fue posible enviar la calificación.";
+
+                    try {
+                        const datos =
+                            await respuesta.json();
+
+                        mensaje =
+                            datos.message || mensaje;
+                    } catch (e) {
+                        // el body no era JSON, usamos el mensaje por defecto
+                    }
+
+                    throw new Error(mensaje);
                 }
 
 
@@ -710,8 +671,8 @@ async function cargarHistorial() {
             .slice()
             .sort(
                 (a, b) =>
-                    new Date(b.fecha) -
-                    new Date(a.fecha)
+                    new Date(b.fechaConsulta) -
+                    new Date(a.fechaConsulta)
             )
             .forEach(
                 (consulta) => {
@@ -733,9 +694,9 @@ async function cargarHistorial() {
 
                             <span class="fecha">
                                 ${
-                                    consulta.fecha
+                                    consulta.fechaConsulta
                                         ? new Date(
-                                            consulta.fecha
+                                            consulta.fechaConsulta
                                         ).toLocaleString(
                                             "es-CO"
                                         )
@@ -745,8 +706,7 @@ async function cargarHistorial() {
 
                             <span class="texto">
                                 ${
-                                    consulta.textoConsulta ||
-                                    ""
+                                    escaparHtml(consulta.texto || "")
                                 }
                             </span>
 
