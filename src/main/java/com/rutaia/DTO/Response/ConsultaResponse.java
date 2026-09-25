@@ -8,6 +8,7 @@ public record ConsultaResponse(
         String texto,
         LocalDateTime fechaConsulta,
         String respuesta,
-        String estado
+        String estado,
+        CalificacionResponse calificacion
 ) {
 }

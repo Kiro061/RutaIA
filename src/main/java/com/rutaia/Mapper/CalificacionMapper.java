@@ -2,33 +2,31 @@ package com.rutaia.Mapper;
 
 import com.rutaia.DTO.Request.CalificacionRequest;
 import com.rutaia.DTO.Response.CalificacionResponse;
-import com.rutaia.DTO.Response.RecomendacionResponse;
 import com.rutaia.Modelo.Calificacion;
-import com.rutaia.Modelo.Recomendacion;
+import com.rutaia.Modelo.Consulta;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CalificacionMapper {
 
-    public Calificacion dtoToEntity(CalificacionRequest dto, Recomendacion recomendacion) {
+    public Calificacion dtoToEntity(CalificacionRequest dto, Consulta consulta) {
         Calificacion calificacion = new Calificacion();
-        calificacion.setRecomendacion(recomendacion);
+        calificacion.setConsulta(consulta);
         calificacion.setPuntuacion(dto.puntuacion());
         calificacion.setComentario(dto.comentario());
         return calificacion;
     }
 
-    public CalificacionResponse entityToDto(Calificacion calificacion, RecomendacionResponse recomendacionResponse) {
+    public CalificacionResponse entityToDto(Calificacion calificacion) {
         return new CalificacionResponse(
                 calificacion.getId(),
-                recomendacionResponse,
+                calificacion.getConsulta().getId(),
                 calificacion.getPuntuacion(),
                 calificacion.getComentario()
         );
     }
 
-    public void updateDtoToEntity(Calificacion calificacion, CalificacionRequest dto, Recomendacion recomendacion) {
-        calificacion.setRecomendacion(recomendacion);
+    public void updateDtoToEntity(Calificacion calificacion, CalificacionRequest dto) {
         calificacion.setPuntuacion(dto.puntuacion());
         calificacion.setComentario(dto.comentario());
     }

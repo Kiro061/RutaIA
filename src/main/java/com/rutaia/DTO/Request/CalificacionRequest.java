@@ -1,11 +1,15 @@
 package com.rutaia.DTO.Request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 public record CalificacionRequest(
-        @NotNull(message = "El id de recomendacion es obligatorio")
-        @Positive(message = "El id de recomendacion debe ser positivo")
-        Long recomendacionId,
+        @NotNull(message = "El id de la consulta es obligatorio")
+        @Positive(message = "El id de la consulta debe ser positivo")
+        Long consultaId,
 
         @NotNull(message = "La puntuacion es obligatoria")
         @Min(value = 1, message = "La puntuacion minima es 1")

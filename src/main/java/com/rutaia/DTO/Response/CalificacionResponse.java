@@ -2,7 +2,7 @@ package com.rutaia.DTO.Response;
 
 public record CalificacionResponse(
         Long id,
-        RecomendacionResponse recomendacion,
+        Long consultaId,
         Integer puntuacion,
         String comentario
 ) {

@@ -1,6 +1,5 @@
 package com.rutaia.Service;
 
-
 import com.rutaia.DTO.Request.CalificacionRequest;
 import com.rutaia.DTO.Response.CalificacionResponse;
 
@@ -14,7 +13,7 @@ public interface CalificacionService {
 
     CalificacionResponse obtenerPorId(Long id);
 
-    CalificacionResponse obtenerPorRecomendacion(Long recomendacionId);
+    CalificacionResponse obtenerPorConsulta(Long consultaId);
 
     List<CalificacionResponse> listarTodas();
 
