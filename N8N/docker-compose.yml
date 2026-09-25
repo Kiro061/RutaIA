@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=earache-removable-gulp.ngrok-free.dev
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://earache-removable-gulp.ngrok-free.dev/
+      - N8N_EDITOR_BASE_URL=https://earache-removable-gulp.ngrok-free.dev/
+      - GENERIC_TIMEZONE=America/Bogota
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - repuestos-net
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"   # API REST / dashboard (http://localhost:6333/dashboard)
+      - "6334:6334"   # gRPC (opcional)
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - repuestos-net
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=3CfMjPLhnPlXV92cFvjd6Q8Ojl7_3WzHR57EpSzyv9p3rt9fU
+    command:
+      - "http"
+      - "n8n:5678"
+      - "--domain=earache-removable-gulp.ngrok-free.dev"
+    depends_on:
+      - n8n
+    networks:
+      - repuestos-net
+
+networks:
+  repuestos-net:
+    driver: bridge
+
+volumes:
+  n8n_data:
+  qdrant_storage:

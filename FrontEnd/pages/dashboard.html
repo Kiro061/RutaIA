@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - RutaIA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<!-- Guardián: si no hay sesión, redirige a login antes de mostrar nada -->
+<script src="../js/auth.js"></script>
+<script>requerirSesion();</script>
+
+<header class="navbar" id="navbar">
+    <div class="logo"><a href="../index.html">RutaIA</a></div>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+
+    <nav id="navMenu">
+        <a href="./dashboard.html">Inicio</a>
+        <a href="./catalogo.html">Catálogo</a>
+        <a href="./consulta.html" data-auth-only hidden>Consulta</a>
+        <a href="./login.html" class="btn-nav" data-guest-only>Iniciar sesión</a>
+
+        <div class="nav-user" data-auth-only hidden>
+            <span class="nav-user-name" id="navUserName"></span>
+            <button class="btn-nav btn-nav--ghost" id="navLogoutBtn">Cerrar sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main class="dashboard">
+
+    <!-- Bienvenida -->
+    <section class="dash-welcome">
+        <div>
+            <span class="section-tag">Panel de control</span>
+            <h1>Hola, <span id="dashNombre">estudiante</span> </h1>
+            <p>Este es el resumen de tu actividad en RutaIA.</p>
+            <p class="dash-perfil" id="dashPerfil"></p>
+        </div>
+        <a href="./consulta.html" class="btn-primary">Nueva consulta</a>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="dash-stats" aria-label="Resumen">
+        <article class="stat-card">
+            <span class="stat-label">Consultas realizadas</span>
+            <strong class="stat-value" id="statConsultas">–</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Cursos en el catálogo</span>
+            <strong class="stat-value" id="statCatalogo">–</strong>
+        </article>
+    </section>
+
+    <div class="dash-grid">
+
+        <!-- Últimas consultas -->
+        <section class="dash-panel">
+            <div class="panel-header">
+                <h2>Últimas consultas</h2>
+                <a href="./consulta.html">Ver historial →</a>
+            </div>
+            <div id="listaConsultas" class="lista">
+                <p class="dash-estado">Cargando…</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Accesos rápidos -->
+    <section class="dash-actions">
+        <a href="./consulta.html" class="action-card">
+            <span class="card-icon">IA</span>
+            <div>
+                <h3>Pregúntale al asesor</h3>
+                <p>Cuéntanos qué quieres aprender y te sugerimos cursos.</p>
+            </div>
+        </a>
+        <a href="./catalogo.html" class="action-card">
+            <span class="card-icon">CT</span>
+            <div>
+                <h3>Explorar el catálogo</h3>
+                <p>Revisa todos los cursos disponibles en la institución.</p>
+            </div>
+        </a>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 RutaIA — Plataforma de recomendación académica</p>
+</footer>
+
+<script src="../js/navbar.js"></script>
+<script src="../js/dashboard.js"></script>
+</body>
+</html>
