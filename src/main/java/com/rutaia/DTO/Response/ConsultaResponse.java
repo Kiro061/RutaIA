@@ -6,6 +6,8 @@ public record ConsultaResponse(
         Long id,
         UsuarioResponse usuario,
         String texto,
-        LocalDateTime fechaConsulta
+        LocalDateTime fechaConsulta,
+        String respuesta,
+        String estado
 ) {
 }

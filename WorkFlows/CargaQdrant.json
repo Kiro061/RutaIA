@@ -1,0 +1,232 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, mensaje: \"Carga inicial en proceso/completada\", curso_id: $json.payload.curso_id } }}",
+        "options": {}
+      },
+      "id": "8875e214-0bb8-44c6-80ff-f680b0abc02f",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item.json;\n\nconst texto = [\n  item.nombre,\n  `categorÃa: ${item.categoria}`,\n  `nivel: ${item.nivel}`,\n  item.descripcion\n].filter(Boolean).join('. ');\n\nreturn {\n  json: {\n    ...item,\n    texto_busqueda: texto\n  }\n};"
+      },
+      "id": "7f757a00-1c0c-4bdc-9b98-8805e2c2886c",
+      "name": "Construir Texto Descriptivo2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"openai/text-embedding-3-small\", input: $json.texto_busqueda }) }}",
+        "options": {}
+      },
+      "id": "48e55eb2-c813-4b8c-a988-528dca88c2f3",
+      "name": "OpenRouter - Generar Embedding2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        512
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "fY1ZOylHdG7Nk50M",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const embedding = $json.data[0].embedding;\nconst original = $('Construir Texto Descriptivo2').item.json;\n\nreturn {\n  json: {\n    id: original.id,\n    vector: embedding,\n    payload: {\n      curso_id: original.id,\n      nombre: original.nombre,\n      descripcion: original.descripcion,\n      categoria: original.categoria,\n      nivel: original.nivel\n    }\n  }\n};"
+      },
+      "id": "2855ac77-397b-4048-acb5-8bd28fd2a390",
+      "name": "Construir Punto Qdrant2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://qdrant:6333/collections/cursos/points",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ points: [ { id: $json.id, vector: $json.vector, payload: $json.payload } ] }) }}",
+        "options": {}
+      },
+      "id": "68d4df54-90a7-421e-8b11-c92504aac45d",
+      "name": "Qdrant - Guardar Vector2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8080/rutaia/api/v1/cursos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -288,
+        512
+      ],
+      "id": "f0a8469d-9929-43af-ae87-976ac0999e63",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/rutaia/api/v1/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"usuario\":\"ejemplo@gmail.com\",\n  \"contrasenia\":\"Incorrect\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -576,
+        512
+      ],
+      "id": "a8fef18a-b36e-4eb4-83eb-00b430d66228",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rutaia-carga-inicial",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ca23131b-e259-41ee-b64b-8f6a32530d9c",
+      "name": "Webhook - Disparar Carga",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        512
+      ],
+      "webhookId": "rutaia-carga-inicial-webhook"
+    }
+  ],
+  "connections": {
+    "Construir Texto Descriptivo2": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter - Generar Embedding2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter - Generar Embedding2": {
+      "main": [
+        [
+          {
+            "node": "Construir Punto Qdrant2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Punto Qdrant2": {
+      "main": [
+        [
+          {
+            "node": "Qdrant - Guardar Vector2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant - Guardar Vector2": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Construir Texto Descriptivo2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Disparar Carga": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "f6c6fdb0ff90f6aee10b62ea282696ce3d4340778dbb1fbfde18d1c6f5f66a73"
+  }
+}

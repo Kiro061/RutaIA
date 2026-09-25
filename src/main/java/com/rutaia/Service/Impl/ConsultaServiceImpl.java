@@ -1,5 +1,6 @@
 package com.rutaia.Service.Impl;
 
+import com.rutaia.DTO.Response.N8nRespuestaDTO;
 import com.rutaia.DTO.Request.ConsultaRequest;
 import com.rutaia.DTO.Response.ConsultaResponse;
 import com.rutaia.Exception.BuisnessRuleException;
@@ -19,10 +20,15 @@ import org.springframework.web.client.RestClient;
 import org.slf4j.Logger;                              // <-- Para el log
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ConsultaServiceImpl implements ConsultaService {
 
     private final ConsultaRepository consultaRepository;
@@ -42,22 +48,30 @@ public class ConsultaServiceImpl implements ConsultaService {
         Consulta consulta = consultaMapper.dtoToEntity(dto, usuario);
 
         consultaRepository.save(consulta);
-        enviarAN8n(consulta);
 
-        return consultaMapper.entityToDto(consulta, usuarioMapper.entityToDto(consulta.getUsuario()));
+        // Llamada SÍNCRONA: esperamos la respuesta del chatbot antes de responderle al frontend
+        N8nRespuestaDTO n8nRespuesta = enviarAN8n(consulta);
+
+        return consultaMapper.entityToDto(consulta, usuarioMapper.entityToDto(consulta.getUsuario()), n8nRespuesta);
     }
 
-    private void enviarAN8n(Consulta consulta) {
+    private N8nRespuestaDTO enviarAN8n(Consulta consulta) {
+        // El workflow de n8n espera exactamente estos dos campos: consulta_id y pregunta.
+        // No se le manda el objeto Consulta completo para no exponer el usuario (con su password) innecesariamente.
+        Map<String, Object> body = new HashMap<>();
+        body.put("consulta_id", consulta.getId());
+        body.put("pregunta", consulta.getTexto());
+
         try {
-            restClient.post()
+            return restClient.post()
                     .uri(n8nWebhookUrl)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(consulta)
+                    .body(body)
                     .retrieve()
-                    .toBodilessEntity(); // Ignora la respuesta si n8n responde 200 OK / 204 No Content
+                    .body(N8nRespuestaDTO.class);
         } catch (Exception e) {
-            // Manejo de error o log según la importancia del envío
-            log.error("Error al enviar la consulta a n8n: {}", e.getMessage());
+            log.error("Error al comunicarse con el motor de recomendaciones (n8n): {}", e.getMessage());
+            return new N8nRespuestaDTO(null, "Error");
         }
     }
 

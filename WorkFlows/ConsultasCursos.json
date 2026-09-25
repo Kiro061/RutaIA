@@ -1,0 +1,270 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rutaia-consulta",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "29f70013-8e32-4058-99f0-133f52e2c31d",
+      "name": "Webhook - Recibir Consulta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -864,
+        96
+      ],
+      "webhookId": "rutaia-consulta-webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"openai/text-embedding-3-small\", input: $json.body.pregunta }) }}",
+        "options": {}
+      },
+      "id": "b4ad84ff-217c-49a9-b3cd-e7d57140276e",
+      "name": "OpenRouter - Embedding de Pregunta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        96
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "fY1ZOylHdG7Nk50M",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://qdrant:6333/collections/cursos/points/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ vector: $json.data[0].embedding, limit: 5, score_threshold: 0.4, with_payload: true }) }}",
+        "options": {}
+      },
+      "id": "950c1f0f-2707-4fbd-86ed-f496993f3f07",
+      "name": "Qdrant - Buscar Cursos Similares",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -416,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const resultados = $json.result || [];\nconst body = $('Webhook - Recibir Consulta').item.json.body;\n\nconst contexto = resultados.map(r =>\n  `- ${r.payload.nombre} (Categoría: ${r.payload.categoria}, Nivel: ${r.payload.nivel}, Similitud: ${(r.score*100).toFixed(1)}%): ${r.payload.descripcion}`\n).join('\\n');\n\nreturn {\n  json: {\n    consulta_id: body.consulta_id,\n    pregunta: body.pregunta,\n    contexto: contexto || null,\n    resultados,\n    hay_resultados: resultados.length > 0\n  }\n};"
+      },
+      "id": "f55a83f5-eacf-428f-aeff-4db88a243169",
+      "name": "Formatear Contexto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.hay_resultados }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "fc03a994-5d2c-4e3c-a84e-c42f1c8c0580",
+      "name": "IF - Hay Resultados",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        32,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"openai/gpt-4o-mini\", messages: [ { role: \"system\", content: \"Eres un asesor académico de RutaIA. Recibes la pregunta de un estudiante y una lista de cursos candidatos encontrados por similitud semántica en el catálogo. Responde de forma clara y breve, recomendando el o los cursos más adecuados basándote únicamente en la lista entregada. No inventes cursos que no estén en la lista. Si la información no es suficiente, dilo honestamente.\" }, { role: \"user\", content: `Pregunta del estudiante: \"${$json.pregunta}\"\\n\\nCursos candidatos:\\n${$json.contexto}` } ] }) }}",
+        "options": {}
+      },
+      "id": "88bc6943-eca8-44c1-a55f-3b1ab1dbfa55",
+      "name": "OpenRouter - Redactar Respuesta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        -16
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "fY1ZOylHdG7Nk50M",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const respuesta = $json.choices[0].message.content;\nconst formateado = $('Formatear Contexto').item.json;\n\nreturn {\n  json: {\n    consulta_id: formateado.consulta_id,\n    pregunta: formateado.pregunta,\n    respuesta,\n    estado: 'Respondida'\n  }\n};"
+      },
+      "id": "0578f48b-dad6-4cbd-936f-49322eedc524",
+      "name": "Preparar Respuesta Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "99d8dadc-1313-4761-9333-f0132f76f024",
+      "name": "Responder al Estudiante",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { consulta_id: $json.consulta_id, pregunta: $json.pregunta, respuesta: \"No se encontraron datos relacionados, por el momento solo tenemos cursos de Tecnologia\", estado: 'Sin resultados' } }}",
+        "options": {}
+      },
+      "id": "93cebd9f-2271-4dd3-a195-b3b79e116284",
+      "name": "Responder Sin Resultados",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        224
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Recibir Consulta": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter - Embedding de Pregunta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter - Embedding de Pregunta": {
+      "main": [
+        [
+          {
+            "node": "Qdrant - Buscar Cursos Similares",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant - Buscar Cursos Similares": {
+      "main": [
+        [
+          {
+            "node": "Formatear Contexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Contexto": {
+      "main": [
+        [
+          {
+            "node": "IF - Hay Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Hay Resultados": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter - Redactar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Sin Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter - Redactar Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Preparar Respuesta Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Respuesta Final": {
+      "main": [
+        [
+          {
+            "node": "Responder al Estudiante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "f6c6fdb0ff90f6aee10b62ea282696ce3d4340778dbb1fbfde18d1c6f5f66a73"
+  }
+}
