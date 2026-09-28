@@ -11,6 +11,10 @@ public record ConsultaRequest(
 
         @NotBlank(message = "El texto de la consulta no puede ser vacio")
         @NotNull(message = "El texto de la consulta no puede ser nulo")
-        String texto
+        String texto,
+
+        @NotNull(message = "Tiene que tener un nivel")
+        @NotBlank(message = "El nivel no puede estar vacio")
+        String nivel
 ) {
 }
